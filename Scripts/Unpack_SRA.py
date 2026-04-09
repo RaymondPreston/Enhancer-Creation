@@ -1,17 +1,21 @@
 import os
+import sys
 import subprocess
 from pathlib import Path
 
 # Configuration
 base_dir = "/scratch/rprest2/Enhancer-Creation/input/SRP435350"
-output_base = "/scratch/rprest2/Enhancer-Creation/input/SRP435350" # Extracting into the same study folder
 
 def unpack_sra(sra_file_path, output_dir):
     """Unpacks a single .sra file using fasterq-dump."""
     print(f"Processing: {sra_file_path}")
     
-    # --split-files is standard for paired-end data; --skip-technical ignores technical reads
-    # --progress shows progress in the logs
+    # Check if files already exist to avoid re-running (Fastq naming: SRRxxxxxx_1.fastq)
+    srr_id = sra_file_path.stem
+    if any(output_dir.glob(f"{srr_id}_*.fastq")):
+        print(f"FASTQ files for {srr_id} already exist. Skipping.")
+        return
+
     cmd = [
         "fasterq-dump",
         "--split-files",
@@ -30,25 +34,34 @@ def unpack_sra(sra_file_path, output_dir):
 def main():
     if not os.path.exists(base_dir):
         print(f"Directory not found: {base_dir}")
-        return
+        sys.exit(1)
 
-    # Walk through the directory to find .sra files
-    # Structure assumed: base_dir/SRRxxxxxx/SRRxxxxxx.sra
-    sra_files = list(Path(base_dir).rglob("*.sra"))
+    # Walk through the directory to find .sra files and sort them for consistent indexing
+    sra_files = sorted(list(Path(base_dir).rglob("*.sra")))
     
     if not sra_files:
         print("No .sra files found.")
-        return
+        sys.exit(0)
 
-    print(f"Found {len(sra_files)} SRA files. Starting extraction...")
+    # Check for SLURM_ARRAY_TASK_ID to run a single file in parallel
+    task_id = os.environ.get("SLURM_ARRAY_TASK_ID")
+    
+    if task_id is not None:
+        idx = int(task_id)
+        if idx < len(sra_files):
+            sra_path = sra_files[idx]
+            output_dir = sra_path.parent
+            unpack_sra(sra_path, output_dir)
+        else:
+            print(f"Task ID {idx} out of range for {len(sra_files)} files.")
+    else:
+        # Fallback to sequential if run manually
+        print(f"No Task ID found. Processing {len(sra_files)} files sequentially...")
+        for sra_path in sra_files:
+            output_dir = sra_path.parent
+            unpack_sra(sra_path, output_dir)
 
-    for sra_path in sra_files:
-        # We'll put the resulting FASTQ files in the same folder as the .sra file
-        # or you can adjust this to a global 'fastq' folder.
-        output_dir = sra_path.parent
-        unpack_sra(sra_path, output_dir)
-
-    print("All tasks completed!")
+    print("Task completed.")
 
 if __name__ == "__main__":
     main()

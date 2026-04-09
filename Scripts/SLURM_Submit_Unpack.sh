@@ -1,14 +1,15 @@
 #!/bin/bash
-#SBATCH --job-name=SRA_Unpack          # Name of the job
+#SBATCH --job-name=SRA_Unpack_Array    # Name of the job
 #SBATCH --account=general              # Required parameter for Emory general partitions
 #SBATCH --partition=c64-m512           # Default general-purpose CPU partition 
 #SBATCH --nodes=1                      # Number of nodes requested
-#SBATCH --ntasks=1                     # Number of tasks
-#SBATCH --cpus-per-task=4              # Unpacking is CPU-bound; fasterq-dump uses multiple threads
-#SBATCH --time=08:00:00                # Requested 8 hours for batch processing
-#SBATCH --mem=16G                      # fasterq-dump requires significant memory for its temporary buffers
-#SBATCH --output=%x_%j.out             # Standard output file (JobName_JobNumber.out)
-#SBATCH --error=%x_%j.err              # Standard error file (JobName_JobNumber.err)
+#SBATCH --ntasks=1                     # One task per array element
+#SBATCH --cpus-per-task=4              # CPUs per file extraction
+#SBATCH --time=12:00:00                # Time limit for a single file extraction
+#SBATCH --mem=16G                      # Memory for fasterq-dump temporary buffers
+#SBATCH --array=0-18                   # Launch 19 parallel tasks (one for each file)
+#SBATCH --output=%x_%A_%a.out          # Output file: JobName_JobID_TaskID.out
+#SBATCH --error=%x_%A_%a.err           # Error file: JobName_JobID_TaskID.err
 
 # Email notifications
 #SBATCH --mail-type=BEGIN
@@ -16,14 +17,13 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rprest2@emory.edu 
 
-# Initialize Conda for Bash shell
+# Initialize Conda
 conda init bash > /dev/null 2>&1
 source ~/.bashrc
 
-# Activate your specific conda environment
-# Ensure this environment has 'sra-tools' installed
+# Activate environment
 conda activate /users/rprest2/.conda/envs/Enhancer-Creation
 
-# Execute the Python unpacking script
-# Pointing to the absolute path on the scratch partition
+# Execute the Python script for the specific array task ID
+# The Python script will pick sra_files[SLURM_ARRAY_TASK_ID]
 python /scratch/rprest2/Enhancer-Creation/Scripts/Unpack_SRA.py
