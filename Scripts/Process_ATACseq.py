@@ -12,8 +12,43 @@ METADATA_FILE = f"{BASE_DIR}/PRJNA960830_Metadata.csv"
 
 # References
 BOWTIE2_INDEX = "/scratch/rprest2/indices/mm10_Bowtie2/mm10"
-# Adapters for ATAC-seq (Nextera)
-ADAPTER = "CTGTCTCTTATACACATCT" 
+
+# ENCODE Adapter sequences for auto-detection
+ADAPTERS = {
+    "Illumina": "AGATCGGAAGAGC",
+    "Nextera": "CTGTCTCTTATA",
+    "smallRNA": "TGGAATTCTCGG"
+}
+
+def detect_adapter(fastq_path, max_reads=250000):
+    """Auto-detect adapter by counting occurrences in the first N reads (ENCODE method)."""
+    print(f"Auto-detecting adapter for {fastq_path}...")
+    counts = {name: 0 for name in ADAPTERS}
+    
+    try:
+        with open(fastq_path, 'r') as f:
+            for i, line in enumerate(f):
+                if i >= max_reads * 4:
+                    break
+                if i % 4 == 1:  # The sequence line in FASTQ
+                    seq = line.strip()
+                    for name, adapter in ADAPTERS.items():
+                        if adapter in seq:
+                            counts[name] += 1
+    except Exception as e:
+        print(f"Warning: Could not read {fastq_path} for adapter detection: {e}")
+        print("Defaulting to Nextera adapter.")
+        return ADAPTERS["Nextera"]
+
+    best_adapter_name = max(counts, key=counts.get)
+    best_adapter_seq = ADAPTERS[best_adapter_name]
+    
+    if counts[best_adapter_name] == 0:
+        print("Warning: No known adapters detected. Defaulting to Nextera.")
+        return ADAPTERS["Nextera"]
+        
+    print(f"Detected {best_adapter_name} adapter ({counts[best_adapter_name]} matches).")
+    return best_adapter_seq
 
 def run_cmd(cmd, shell=False):
     print(f"Executing: {' '.join(cmd) if not shell else cmd}")
@@ -44,10 +79,13 @@ def main():
     fq2 = Path(INPUT_DIR) / srr_id / f"{srr_id}_2.fastq"
 
     # 1. Adapter Trimming (cutadapt v1.9.1)
+    # Auto-detect adapter using ENCODE methodology
+    detected_adapter = detect_adapter(str(fq1))
+    
     fq1_trimmed = sample_out / f"{srr_id}_1_trimmed.fastq.gz"
     fq2_trimmed = sample_out / f"{srr_id}_2_trimmed.fastq.gz"
     run_cmd([
-        "cutadapt", "-a", ADAPTER, "-A", ADAPTER,
+        "cutadapt", "-a", detected_adapter, "-A", detected_adapter,
         "-o", str(fq1_trimmed), "-p", str(fq2_trimmed),
         "-m", "30", "--cores=8",
         str(fq1), str(fq2)
