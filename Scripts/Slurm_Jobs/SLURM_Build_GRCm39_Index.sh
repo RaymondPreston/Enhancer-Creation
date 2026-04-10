@@ -13,7 +13,7 @@
 # Init Conda
 conda init bash > /dev/null 2>&1
 source ~/.bashrc
-conda activate /users/rprest2/.conda/envs/Enhancer-Creation
+conda activate /users/rprest2/.conda/envs/salmon_env
 
 # Define directories
 INDICES_DIR="/scratch/rprest2/indices"
