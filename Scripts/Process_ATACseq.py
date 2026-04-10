@@ -87,7 +87,7 @@ def main():
     run_cmd([
         "cutadapt", "-a", detected_adapter, "-A", detected_adapter,
         "-o", str(fq1_trimmed), "-p", str(fq2_trimmed),
-        "-m", "30", "--cores=8",
+        "-e", "0.1", "-m", "5", "--cores=8",
         str(fq1), str(fq2)
     ])
 
