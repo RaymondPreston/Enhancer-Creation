@@ -1,0 +1,60 @@
+SRR,SRX,Sample_Name,Assay,Sample_Title_Raw,Phenotype,Sample_Type_Raw,Experiment_Type
+SRR31189867,SRX26571413,KPC-1_Hi3_ATAC,ATAC-seq,,metastasis-high,biological replicate 3,met-high
+SRR31189868,SRX26571412,KPC-1_Hi2_ATAC,ATAC-seq,,metastasis-high,biological replicate 2,met-high
+SRR31189869,SRX26571411,KPC-1_Hi1_ATAC,ATAC-seq,,metastasis-high,biological replicate 1,met-high
+SRR31189870,SRX26571410,KPC-1_Lo7_ATAC,ATAC-seq,,metastasis-low,biological replicate 7,met-low
+SRR31189871,SRX26571409,KPC-1_Lo6_ATAC,ATAC-seq,,metastasis-low,biological replicate 6,met-low
+SRR31189872,SRX26571408,KPC-1_Lo5_ATAC,ATAC-seq,,metastasis-low,biological replicate 5,met-low
+SRR31189873,SRX26571407,KPC-2_Hi2_RNA,RNA-Seq,,metastasis-high,biological replicate 2,met-high
+SRR31189874,SRX26571406,KPC-2_Hi1_RNA,RNA-Seq,,metastasis-high,biological replicate 1,met-high
+SRR31189875,SRX26571405,KPC-2_Lo5_RNA,RNA-Seq,,metastasis-low,biological replicate 5,met-low
+SRR31189876,SRX26571404,KPC-2_Lo4_RNA,RNA-Seq,,metastasis-low,biological replicate 4,met-low
+SRR31189877,SRX26571403,KPC-1_Lo4_ATAC,ATAC-seq,,metastasis-low,biological replicate 4,met-low
+SRR31189878,SRX26571402,KPC-2_Lo3_RNA,RNA-Seq,,metastasis-low,biological replicate 3,met-low
+SRR31189879,SRX26571401,KPC-2_Lo2_RNA,RNA-Seq,,metastasis-low,biological replicate 2,met-low
+SRR31189880,SRX26571400,KPC-1_Hi3_RNA,RNA-Seq,,metastasis-high,biological replicate 3,met-high
+SRR31189881,SRX26571399,KPC-1_Hi2_RNA,RNA-Seq,,metastasis-high,biological replicate 2,met-high
+SRR31189882,SRX26571398,KPC-1_Hi1_RNA,RNA-Seq,,metastasis-high,biological replicate 1,met-high
+SRR31189883,SRX26571397,KPC-1_Lo7_RNA,RNA-Seq,,metastasis-low,biological replicate 7,met-low
+SRR31189884,SRX26571396,KPC-1_Lo6_RNA,RNA-Seq,,metastasis-low,biological replicate 6,met-low
+SRR31189885,SRX26571395,KPC-1_Lo5_RNA,RNA-Seq,,metastasis-low,biological replicate 5,met-low
+SRR31189886,SRX26571394,KPC-1_Lo4_RNA,RNA-Seq,,metastasis-low,biological replicate 4,met-low
+SRR31189887,SRX26571393,KPC-1_Lo3_RNA,RNA-Seq,,metastasis-low,biological replicate 3,met-low
+SRR31189888,SRX26571392,KPC-1_Lo3_ATAC,ATAC-seq,,metastasis-low,biological replicate 3,met-low
+SRR31189889,SRX26571391,KPC-1_Lo2_RNA,RNA-Seq,,metastasis-low,biological replicate 2,met-low
+SRR31189890,SRX26571390,KPC-1_Lo1_RNA,RNA-Seq,,metastasis-low,biological replicate 1,met-low
+SRR31189891,SRX26571389,KPC-2_Hi2_ATAC,ATAC-seq,,metastasis-high,biological replicate 2,met-high
+SRR31189892,SRX26571388,KPC-2_Hi1_ATAC_r2,ATAC-seq,,metastasis-high,biological replicate 1,met-high
+SRR31189893,SRX26571387,KPC-2_Hi1_ATAC_r1,ATAC-seq,,metastasis-high,biological replicate 1,met-high
+SRR31189894,SRX26571386,KPC-2_Lo5_ATAC,ATAC-seq,,metastasis-low,biological replicate 5,met-low
+SRR31189895,SRX26571385,KPC-2_Lo4_ATAC,ATAC-seq,,metastasis-low,biological replicate 4,met-low
+SRR31189896,SRX26571384,KPC-2_Lo3_ATAC_r2,ATAC-seq,,metastasis-low,biological replicate 3,met-low
+SRR31189897,SRX26571383,KPC-2_Lo3_ATAC_r1,ATAC-seq,,metastasis-low,biological replicate 3,met-low
+SRR31189898,SRX26571382,KPC-2_Lo2_ATAC,ATAC-seq,,metastasis-low,biological replicate 2,met-low
+SRR31189899,SRX26571381,KPC-1_Lo2_ATAC,ATAC-seq,,metastasis-low,biological replicate 2,met-low
+SRR31189900,SRX26571380,KPC-1_Lo1_ATAC,ATAC-seq,,metastasis-low,biological replicate 1,met-low
+SRR31192737,SRX26574051,KPC-2_Lo1_RNA,RNA-Seq,,metastasis-low,biological replicate 1,met-low
+SRR31192738,SRX26574050,KPC-2_Lo1_ATAC,ATAC-seq,,metastasis-low,biological replicate 1,met-low
+SRR31192739,SRX26574049,KPC-2_parental_ATAC_r2,ATAC-seq,,parental,biological replicate 2,parental
+SRR31192740,SRX26574048,KPC-2_parental_ATAC_r1,ATAC-seq,,parental,biological replicate 2,parental
+SRR31192741,SRX26574047,KPC-1_parental_ATAC_r2,ATAC-seq,,parental,biological replicate 1,parental
+SRR31192742,SRX26574046,KPC-1_parental_ATAC_r1,ATAC-seq,,parental,biological replicate 1,parental
+SRR33564022,SRX28794094,Post-liver metastasis replicate 3,ATAC-seq,,post-liver metastasis,biological replicate 3,pre/post-colonization
+SRR33564023,SRX28794093,Post-liver metastasis replicate 2,ATAC-seq,,post-liver metastasis,biological replicate 2,pre/post-colonization
+SRR33564024,SRX28794092,Post-liver metastasis replicate 1,ATAC-seq,,post-liver metastasis,biological replicate 1,pre/post-colonization
+SRR33564025,SRX28794091,Pre-injection replicate 4,ATAC-seq,,pre-injection,technical replicate 4,pre/post-colonization
+SRR33564026,SRX28794090,Pre-injection replicate 3,ATAC-seq,,pre-injection,technical replicate 3,pre/post-colonization
+SRR33564027,SRX28794089,Pre-injection replicate 2,ATAC-seq,,pre-injection,technical replicate 2,pre/post-colonization
+SRR33564028,SRX28794088,Pre-injection replicate 1,ATAC-seq,,pre-injection,technical replicate 1,pre/post-colonization
+SRR34560818,SRX29703189,KPC-2_HiB shControl replicate 3,RNA-Seq,,control,biological replicate 3,Fos-KD
+SRR34560819,SRX29703188,KPC-2_HiB shControl replicate 2,RNA-Seq,,control,biological replicate 2,Fos-KD
+SRR34560820,SRX29703187,KPC-2_HiB shControl replicate 1,RNA-Seq,,control,biological replicate 1,Fos-KD
+SRR35050614,SRX30164811,KPC-2_HiB shControl CUT&Run FOS replicate 2,OTHER,,shControl,FOS technical replicate 2,c-Fos binding
+SRR35050615,SRX30164810,KPC-2_HiB shControl CUT&Run FOS replicate 1,OTHER,,shControl,FOS technical replicate 1,c-Fos binding
+SRR35050616,SRX30164809,KPC-2_HiB shControl CUT&Run No Ab Control,OTHER,,shControl,NoAb control,c-Fos binding
+SRR35050617,SRX30164808,KPC-2_HiB shFos2 replicate 3,RNA-Seq,,shFos2,biological replicate 3,Fos-KD
+SRR35050618,SRX30164807,KPC-2_HiB shFos2 replicate 2,RNA-Seq,,shFos2,biological replicate 2,Fos-KD
+SRR35050619,SRX30164806,KPC-2_HiB shFos2 replicate 1,RNA-Seq,,shFos2,biological replicate 1,Fos-KD
+SRR35050620,SRX30164805,KPC-2_HiB shFos1 replicate 3,RNA-Seq,,shFos1,biological replicate 3,Fos-KD
+SRR35050621,SRX30164804,KPC-2_HiB shFos1 replicate 2,RNA-Seq,,shFos1,biological replicate 2,Fos-KD
+SRR35050622,SRX30164803,KPC-2_HiB shFos1 replicate 1,RNA-Seq,,shFos1,biological replicate 1,Fos-KD
