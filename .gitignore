@@ -1,5 +1,6 @@
 input/
-outpuit/
+output/
+atac-seq-pipeline/
 *.err
 *.out
 GEMINI.md
