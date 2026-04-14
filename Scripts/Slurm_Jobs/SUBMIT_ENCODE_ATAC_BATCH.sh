@@ -11,13 +11,32 @@ JSON_DIR="$BASE_DIR/input_jsons"
 # Ensure output directory for JSONs exists
 mkdir -p $JSON_DIR
 
-echo "Starting ENCODE pipeline submission for ATAC-seq samples..."
+# --- Batching Logic ---
+BATCH_SIZE=6
+BATCH_NUM=${1:-1} # Default to batch 1, if $1 is not provided
 
+START_IDX=$(( (BATCH_NUM - 1) * BATCH_SIZE + 1 ))
+END_IDX=$(( BATCH_NUM * BATCH_SIZE ))
+
+echo "Starting ENCODE pipeline submission for ATAC-seq samples (Batch $BATCH_NUM: Samples $START_IDX to $END_IDX)..."
+
+count=0
 # Iterate through the metadata CSV
 # Skipping the header and filtering for ATAC-seq rows
-grep -i "ATAC-seq" $METADATA | while IFS=, read -r srr srx name assay rest; do
+grep -i "ATAC-seq" "$METADATA" | while IFS=, read -r srr srx name assay rest; do
+    count=$((count + 1))
     
-    echo "Generating configuration for $srr ($name)..."
+    # Skip until we reach the start index for this batch
+    if [ "$count" -lt "$START_IDX" ]; then
+        continue
+    fi
+    
+    # Stop if we have passed the end index for this batch
+    if [ "$count" -gt "$END_IDX" ]; then
+        break
+    fi
+    
+    echo "Generating configuration for $srr ($name) [Sample $count]..."
     
     JSON_FILE="$JSON_DIR/${srr}_input.json"
     
