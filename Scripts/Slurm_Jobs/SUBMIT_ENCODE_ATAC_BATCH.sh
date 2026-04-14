@@ -38,7 +38,8 @@ EOF
 
     echo "Submitting $srr to SLURM via Caper..."
     # --conda uses the pipeline environments you just installed
-    caper hpc submit $WDL_PATH -i $JSON_FILE --conda --leader-job-name "ENCODE_$srr"
+    OPTS_FILE="$BASE_DIR/Scripts/Slurm_Jobs/cromwell_options.json"
+    caper hpc submit $WDL_PATH -i $JSON_FILE --workflow-opts $OPTS_FILE --conda --leader-job-name "ENCODE_$srr"
     
     echo "Submission successful for $srr."
     echo "------------------------------------------------"
