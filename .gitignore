@@ -1,6 +1,10 @@
 input/
 output/
-atac-seq-pipeline/
 *.err
 *.out
+.caper_tmp/
+.empty/
+.vscode/
+atac-seq-pipeline/
+croo_out/
 GEMINI.md

@@ -1,43 +1,65 @@
-# Scripts/Generate_Consensus_Peaks.R
-# This script uses DiffBind to merge individual ATAC-seq peaks into a master consensus BED file.
+#import required packages
+library(DiffBind)
+library(DESeq2)
+library(rtracklayer)
+library(ggplot2)
+library(clusterProfiler)
+library(ChIPseeker)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(org.Mm.eg.db)
+library(ComplexHeatmap)
+library(dplyr)
 
-# Load required library
-suppressPackageStartupMessages(library(DiffBind))
+#cluster all KPC samples together, compare metastatic vs. nonmetastatic
+#import sample sheet
+samples_all = read.csv("diffbind_sample_sheet_KPC_all_no_H10.csv")
 
-# --- Configuration ---
-# You will need to generate this CSV based on your croo output paths
-SAMPLE_SHEET_PATH <- "/scratch/rprest2/Enhancer-Creation/ATAC_samplesheet.csv"
-OUTPUT_BED <- "/scratch/rprest2/Enhancer-Creation/output/consensus_peaks.bed"
-QC_PLOT <- "/scratch/rprest2/Enhancer-Creation/output/DiffBind_Initial_Correlation.pdf"
+#read in peaksets
+KPC_all = dba(sampleSheet=samples_all)
 
-print(paste("Loading sample sheet from:", SAMPLE_SHEET_PATH))
-samples <- read.csv(SAMPLE_SHEET_PATH)
+#generate insertion counts matrix
+KPC_all_counts = dba.count(KPC_all, summits = 250)
 
-# 1. Initialize DiffBind object
-print("Initializing DiffBind object (Reading peaks)...")
-dba_obj <- dba(sampleSheet=samples)
+# Extract the full consensus peak set (all peaks, not just DA)
+consensus_peaks <- dba.peakset(KPC_all_counts, bRetrieve=TRUE)
+export(consensus_peaks, "consensus_peaks_all.bed")
 
-# Optional: Generate a correlation heatmap of the peak overlaps for QC
-print(paste("Saving initial peak correlation plot to:", QC_PLOT))
-pdf(QC_PLOT)
-plot(dba_obj)
-dev.off()
+#normalize by total reads in peaks
+KPC_all_counts_norm_trip = dba.normalize(KPC_all_counts, library=DBA_LIBSIZE_PEAKREADS)
 
-# 2. Generate Consensus Peaks & Count
-# dba.count identifies overlapping peaks to create the consensus set. 
-# By default (minOverlap=2), a peak must be present in at least 2 samples to be kept.
-print("Generating consensus peakset and counting reads (This may take some time)...")
-dba_obj <- dba.count(dba_obj, bUseSummarizeOverlaps=TRUE)
+#perform differential accessibility analysis comparing metastatic to non-metastatic samples using matrix normalized by trip
+KPC_all_counts_norm_trip_DA = dba.contrast(KPC_all_counts_norm_trip, design="~Tissue + Condition")
+KPC_all_counts_norm_trip_DA = dba.analyze(KPC_all_counts_norm_trip_DA)
 
-# 3. Extract the consensus coordinates
-print("Extracting consensus peak coordinates...")
-consensus_peaks <- dba.peakset(dba_obj, bRetrieve=TRUE)
+dba.show(KPC_all_counts_norm_trip_DA, bContrasts=TRUE)
 
-# Convert to a standard dataframe (chr, start, end)
-df_consensus <- as.data.frame(consensus_peaks)[, c("seqnames", "start", "end")]
+met_vs_nonmet_trip.DB = dba.report(KPC_all_counts_norm_trip_DA, th=0.05, contrast=2)
+met_vs_nonmet_trip.DB = met_vs_nonmet_trip.DB[order(met_vs_nonmet_trip.DB$Fold, decreasing=TRUE),]
+met_vs_nonmet_trip.DB_up = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold>0,]
+met_vs_nonmet_trip.DB_down = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold<0,]
+met_vs_nonmet_trip.DB_complete <- dba.report(KPC_all_counts_norm_trip_DA, th=1, contrast=2)
 
-# 4. Export to standard BED format for CREsted
-print(paste("Saving", nrow(df_consensus), "consensus peaks to:", OUTPUT_BED))
-write.table(df_consensus, file=OUTPUT_BED, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+#annotate peaks
+anno = annotatePeak(met_vs_nonmet_trip.DB,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
+anno_df = as.data.frame(anno)
+anno_df = anno_df[order(anno_df$Fold),]
+saveRDS(anno_df, file = "annotated_differentially_accessible_peaks_no_H10.RDS")
 
-print("Consensus peak generation complete!")
+anno_complete = annotatePeak(met_vs_nonmet_trip.DB_complete,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
+anno_complete_df <- as.data.frame(anno_complete)
+anno_complete_df = anno_complete_df[order(-anno_complete_df$Fold),]
+saveRDS(anno_complete_df, file = "annotated_complete_peakset_no_H10.RDS")
+
+#generate heatmap
+report_df = as.data.frame(met_vs_nonmet_trip.DB)
+report_df <- report_df[order(-report_df$Fold),]
+counts <- dba.peakset(KPC_all_counts_norm_trip_DA, bRetrieve=T, DataType=DBA_DATA_FRAME)
+differential_peaks = as.numeric(rownames(report_df))
+differential_peak_counts = counts[differential_peaks,]
+differential_peak_counts <- differential_peak_counts[,-c(1,2,3)]
+
+mat = data.matrix(differential_peak_counts)
+log2mat = log2(1+mat)
+log2mat = t(scale(t(log2mat)))
+Heatmap(log2mat, show_row_names = FALSE, cluster_rows = FALSE)
+           
