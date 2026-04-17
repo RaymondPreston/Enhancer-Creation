@@ -4,10 +4,11 @@
 #SBATCH --error=logs/consensus_peaks_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=96G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=128G
 #SBATCH --time=08:00:00
 #SBATCH --partition=c128-m1024
+
 
 # 2. Run the Consensus Peaks R script
 echo "Running Generate_Consensus_Peaks.R..."
