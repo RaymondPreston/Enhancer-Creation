@@ -9,3 +9,4 @@ atac-seq-pipeline/
 bigwigs/
 croo_out/
 GEMINI.md
+wandb/
