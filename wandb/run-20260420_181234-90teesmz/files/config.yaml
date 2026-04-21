@@ -1,0 +1,201 @@
+_wandb:
+    value:
+        cli_version: 0.26.0
+        e:
+            uassdddbj09l482o8pmfv34zs60zdnww:
+                codePath: Scripts/Crested_Finetune_Training.py
+                codePathLocal: Scripts/Crested_Finetune_Training.py
+                cpu_count: 48
+                cpu_count_logical: 96
+                cudaVersion: "12.2"
+                disk:
+                    /:
+                        total: "429417017344"
+                        used: "115511345152"
+                email: raymondpreston8@gmail.com
+                executable: /users/rprest2/.conda/envs/Crested/bin/python
+                git:
+                    commit: 2925781d1769afc0cd8e73fc9f8e7afd889394e9
+                    remote: git@github.com:RaymondPreston/Enhancer-Creation.git
+                gpu: NVIDIA A100-SXM4-40GB
+                gpu_count: 8
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-4d42ca0a-9370-f3c9-76d7-fcfdf243b291
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-d6059f6f-5063-4d22-1211-24c5b1d07dcb
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-b56b864e-8370-02b3-13db-212a97a06213
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-ccbca6ff-4b3c-aaae-2406-e633d9453c43
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-d6195a88-f211-5a2a-23cf-ede5e9e4b528
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-7ceb36af-18f7-7268-450f-fc31fb6b07f6
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-bd592b8d-7fa0-63c6-10bf-787e948552c0
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "42949672960"
+                      name: NVIDIA A100-SXM4-40GB
+                      uuid: GPU-57bc5868-5277-4e45-aa3b-a53af4aba5c9
+                host: hyper-01-prod-comp-di-0241-33.ec2.internal
+                memory:
+                    total: "1204526862336"
+                os: Linux-6.1.94-99.176.amzn2023.x86_64-x86_64-with-glibc2.34
+                program: /scratch/rprest2/Enhancer-Creation/Scripts/Crested_Finetune_Training.py
+                python: CPython 3.11.15
+                root: /scratch/rprest2/Enhancer-Creation
+                slurm:
+                    cluster_name: cirrostratus
+                    conf: /opt/slurm/etc/slurm.conf
+                    cpus_on_node: "8"
+                    cpus_per_task: "8"
+                    gpus: "1"
+                    gpus_on_node: "1"
+                    gtids: "0"
+                    job_account: ai-gpu
+                    job_cpus_per_node: "8"
+                    job_end_time: "1776795110"
+                    job_gid: "88"
+                    job_gpus: "2"
+                    job_id: "485414"
+                    job_name: crested_finetune
+                    job_nodelist: a100-8-gm320-c96-m1152-st-p4d-24xlarge-1
+                    job_num_nodes: "1"
+                    job_partition: a100-8-gm320-c96-m1152
+                    job_qos: normal
+                    job_start_time: "1776708710"
+                    job_uid: "33072"
+                    job_user: rprest2
+                    jobid: "485414"
+                    localid: "0"
+                    mem_per_node: "65536"
+                    nnodes: "1"
+                    nodeid: "0"
+                    nodelist: a100-8-gm320-c96-m1152-st-p4d-24xlarge-1
+                    nprocs: "1"
+                    ntasks: "1"
+                    prio_process: "0"
+                    procid: "0"
+                    submit_dir: /scratch/rprest2/Enhancer-Creation
+                    submit_host: hyper-01-prod-ondemand-241-199.ec2.internal
+                    task_pid: "2327207"
+                    tasks_per_node: "1"
+                    topology_addr: a100-8-gm320-c96-m1152-st-p4d-24xlarge-1
+                    topology_addr_pattern: node
+                    tres_per_task: cpu:8
+                startedAt: "2026-04-20T18:12:34.896814Z"
+                writerId: uassdddbj09l482o8pmfv34zs60zdnww
+        m:
+            - "1": epoch/epoch
+              "6":
+                - 3
+              "7": []
+            - "1": batch/batch_step
+              "6":
+                - 3
+              "7": []
+            - "2": batch/*
+              "5": 2
+              "6":
+                - 1
+              "7": []
+            - "2": epoch/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.11.15
+        t:
+            "1":
+                - 2
+                - 3
+                - 5
+                - 53
+            "2":
+                - 2
+                - 3
+                - 5
+                - 53
+            "3":
+                - 2
+                - 7
+                - 13
+                - 38
+            "4": 3.11.15
+            "5": 0.26.0
+            "12": 0.26.0
+            "13": linux-x86_64
+batch_size:
+    value: 64
+early_stopping:
+    value: true
+early_stopping_patience:
+    value: 6
+epochs:
+    value: 60
+in_memory:
+    value: true
+learning_rate_reduce:
+    value: true
+learning_rate_reduce_patience:
+    value: 5
+loss:
+    value:
+        loss: CosineMSELogLoss
+max_stochastic_shift:
+    value: 3
+metrics:
+    value:
+        - MeanAbsoluteError
+        - MeanSquaredError
+        - CosineSimilarity
+        - PearsonCorrelation
+        - ConcordanceCorrelationCoefficient
+        - PearsonCorrelationLog
+mixed_precision:
+    value: false
+model_checkpointing:
+    value: true
+model_checkpointing_best_only:
+    value: true
+n_train:
+    value: 41588
+n_train_steps_per_epoch:
+    value: 650
+n_val:
+    value: 2059
+n_val_steps_per_epoch:
+    value: 33
+optimizer:
+    value:
+        learning_rate: 9.999999747378752e-05
+        optimizer: Adam
+random_reverse_complement:
+    value: false
+seq_len:
+    value: 2114
+shuffle:
+    value: true

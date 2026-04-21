@@ -8,25 +8,11 @@ from crested.tl.data import AnnDataModule
 import numpy as np
 
 
-
 print("Loading preprocessed dataset...")
 # Load the preprocessed anndata
 adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad")
 
 print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
-
-genome = crested.Genome(
-        fasta="/scratch/rprest2/indices/mm10_encode.fa",
-        chrom_sizes="/scratch/rprest2/indices/mm10_no_alt.chrom.sizes.tsv")
-crested.register_genome(genome)
-
-# Create the Data Module
-print("Initializing Data Module...")
-datamodule = AnnDataModule(adata, 
-                        batch_size = 128,
-                        max_stochastic_shift=3,
-                        always_reverse_complement=True
-)
 
 
 # Define the Model Architecture

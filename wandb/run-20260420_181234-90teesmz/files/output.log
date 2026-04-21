@@ -1,0 +1,190 @@
+Model: "functional"
+┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)        ┃ Output Shape      ┃    Param # ┃ Connected to      ┃
+┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ sequence            │ (None, 2114, 4)   │          0 │ -                 │
+│ (InputLayer)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ conv1d (Conv1D)     │ (None, 2114, 512) │     10,240 │ sequence[0][0]    │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ batch_normalization │ (None, 2114, 512) │      2,048 │ conv1d[0][0]      │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ activation          │ (None, 2114, 512) │          0 │ batch_normalizat… │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ dropout (Dropout)   │ (None, 2114, 512) │          0 │ activation[0][0]  │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_1conv         │ (None, 2110, 512) │    786,432 │ dropout[0][0]     │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_1bn           │ (None, 2110, 512) │      2,048 │ bpnet_1conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_1activation   │ (None, 2110, 512) │          0 │ bpnet_1bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_1crop         │ (None, 2110, 512) │          0 │ dropout[0][0]     │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add (Add)           │ (None, 2110, 512) │          0 │ bpnet_1activatio… │
+│                     │                   │            │ bpnet_1crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_1dropout      │ (None, 2110, 512) │          0 │ add[0][0]         │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_2conv         │ (None, 2102, 512) │    786,432 │ bpnet_1dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_2bn           │ (None, 2102, 512) │      2,048 │ bpnet_2conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_2activation   │ (None, 2102, 512) │          0 │ bpnet_2bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_2crop         │ (None, 2102, 512) │          0 │ bpnet_1dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_1 (Add)         │ (None, 2102, 512) │          0 │ bpnet_2activatio… │
+│                     │                   │            │ bpnet_2crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_2dropout      │ (None, 2102, 512) │          0 │ add_1[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_3conv         │ (None, 2086, 512) │    786,432 │ bpnet_2dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_3bn           │ (None, 2086, 512) │      2,048 │ bpnet_3conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_3activation   │ (None, 2086, 512) │          0 │ bpnet_3bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_3crop         │ (None, 2086, 512) │          0 │ bpnet_2dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_2 (Add)         │ (None, 2086, 512) │          0 │ bpnet_3activatio… │
+│                     │                   │            │ bpnet_3crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_3dropout      │ (None, 2086, 512) │          0 │ add_2[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_4conv         │ (None, 2054, 512) │    786,432 │ bpnet_3dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_4bn           │ (None, 2054, 512) │      2,048 │ bpnet_4conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_4activation   │ (None, 2054, 512) │          0 │ bpnet_4bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_4crop         │ (None, 2054, 512) │          0 │ bpnet_3dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_3 (Add)         │ (None, 2054, 512) │          0 │ bpnet_4activatio… │
+│                     │                   │            │ bpnet_4crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_4dropout      │ (None, 2054, 512) │          0 │ add_3[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_5conv         │ (None, 1990, 512) │    786,432 │ bpnet_4dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_5bn           │ (None, 1990, 512) │      2,048 │ bpnet_5conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_5activation   │ (None, 1990, 512) │          0 │ bpnet_5bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_5crop         │ (None, 1990, 512) │          0 │ bpnet_4dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_4 (Add)         │ (None, 1990, 512) │          0 │ bpnet_5activatio… │
+│                     │                   │            │ bpnet_5crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_5dropout      │ (None, 1990, 512) │          0 │ add_4[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_6conv         │ (None, 1862, 512) │    786,432 │ bpnet_5dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_6bn           │ (None, 1862, 512) │      2,048 │ bpnet_6conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_6activation   │ (None, 1862, 512) │          0 │ bpnet_6bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_6crop         │ (None, 1862, 512) │          0 │ bpnet_5dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_5 (Add)         │ (None, 1862, 512) │          0 │ bpnet_6activatio… │
+│                     │                   │            │ bpnet_6crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_6dropout      │ (None, 1862, 512) │          0 │ add_5[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_7conv         │ (None, 1606, 512) │    786,432 │ bpnet_6dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_7bn           │ (None, 1606, 512) │      2,048 │ bpnet_7conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_7activation   │ (None, 1606, 512) │          0 │ bpnet_7bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_7crop         │ (None, 1606, 512) │          0 │ bpnet_6dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_6 (Add)         │ (None, 1606, 512) │          0 │ bpnet_7activatio… │
+│                     │                   │            │ bpnet_7crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_7dropout      │ (None, 1606, 512) │          0 │ add_6[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_8conv         │ (None, 1094, 512) │    786,432 │ bpnet_7dropout[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_8bn           │ (None, 1094, 512) │      2,048 │ bpnet_8conv[0][0] │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_8activation   │ (None, 1094, 512) │          0 │ bpnet_8bn[0][0]   │
+│ (Activation)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_8crop         │ (None, 1094, 512) │          0 │ bpnet_7dropout[0… │
+│ (Cropping1D)        │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ add_7 (Add)         │ (None, 1094, 512) │          0 │ bpnet_8activatio… │
+│                     │                   │            │ bpnet_8crop[0][0] │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bpnet_8dropout      │ (None, 1094, 512) │          0 │ add_7[0][0]       │
+│ (Dropout)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ global_average_poo… │ (None, 512)       │          0 │ bpnet_8dropout[0… │
+│ (GlobalAveragePool… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ dense_out (Dense)   │ (None, 16)        │      8,208 │ global_average_p… │
+└─────────────────────┴───────────────────┴────────────┴───────────────────┘
+ Total params: 6,328,336 (24.14 MB)
+ Trainable params: 6,319,120 (24.11 MB)
+ Non-trainable params: 9,216 (36.00 KB)
+None
+2026-04-20T18:12:36.544286+0000 INFO Loading sequences into memory...
+100%|██████████| 20794/20794 [00:18<00:00, 1118.19it/s]
+2026-04-20T18:12:55.189751+0000 INFO Loading sequences into memory...
+100%|██████████| 2059/2059 [00:02<00:00, 966.69it/s] 
+Epoch 1/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m296s[0m 302ms/step - concordance_correlation_coefficient: 0.3576 - cosine_similarity: 0.8448 - loss: -0.4576 - mean_absolute_error: 0.0016 - mean_squared_error: 1.6082e-05 - pearson_correlation: 0.5375 - pearson_correlation_log: 0.6598 - val_concordance_correlation_coefficient: 0.2292 - val_cosine_similarity: 0.7855 - val_loss: -0.2196 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.1591e-05 - val_pearson_correlation: 0.3731 - val_pearson_correlation_log: 0.5309 - learning_rate: 1.0000e-04
+Epoch 2/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 114ms/step - concordance_correlation_coefficient: 0.4023 - cosine_similarity: 0.8506 - loss: -0.4873 - mean_absolute_error: 0.0015 - mean_squared_error: 1.5147e-05 - pearson_correlation: 0.5863 - pearson_correlation_log: 0.6914 - val_concordance_correlation_coefficient: 0.2326 - val_cosine_similarity: 0.7920 - val_loss: -0.2298 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.1515e-05 - val_pearson_correlation: 0.3751 - val_pearson_correlation_log: 0.5311 - learning_rate: 1.0000e-04
+Epoch 3/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.4397 - cosine_similarity: 0.8537 - loss: -0.5027 - mean_absolute_error: 0.0015 - mean_squared_error: 1.4508e-05 - pearson_correlation: 0.6067 - pearson_correlation_log: 0.7068 - val_concordance_correlation_coefficient: 0.2067 - val_cosine_similarity: 0.7976 - val_loss: -0.2215 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.2069e-05 - val_pearson_correlation: 0.3579 - val_pearson_correlation_log: 0.5253 - learning_rate: 1.0000e-04
+Epoch 4/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.4712 - cosine_similarity: 0.8564 - loss: -0.5161 - mean_absolute_error: 0.0015 - mean_squared_error: 1.3908e-05 - pearson_correlation: 0.6282 - pearson_correlation_log: 0.7199 - val_concordance_correlation_coefficient: 0.2359 - val_cosine_similarity: 0.7812 - val_loss: -0.2025 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.1975e-05 - val_pearson_correlation: 0.3534 - val_pearson_correlation_log: 0.5240 - learning_rate: 1.0000e-04
+Epoch 5/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.5016 - cosine_similarity: 0.8583 - loss: -0.5265 - mean_absolute_error: 0.0015 - mean_squared_error: 1.3545e-05 - pearson_correlation: 0.6315 - pearson_correlation_log: 0.7299 - val_concordance_correlation_coefficient: 0.2307 - val_cosine_similarity: 0.7924 - val_loss: -0.2221 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.2048e-05 - val_pearson_correlation: 0.3493 - val_pearson_correlation_log: 0.5216 - learning_rate: 1.0000e-04
+Epoch 6/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.5205 - cosine_similarity: 0.8604 - loss: -0.5373 - mean_absolute_error: 0.0014 - mean_squared_error: 1.3052e-05 - pearson_correlation: 0.6524 - pearson_correlation_log: 0.7401 - val_concordance_correlation_coefficient: 0.2276 - val_cosine_similarity: 0.7980 - val_loss: -0.2265 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.2497e-05 - val_pearson_correlation: 0.3339 - val_pearson_correlation_log: 0.5249 - learning_rate: 1.0000e-04
+Epoch 7/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.5500 - cosine_similarity: 0.8626 - loss: -0.5470 - mean_absolute_error: 0.0014 - mean_squared_error: 1.2705e-05 - pearson_correlation: 0.6562 - pearson_correlation_log: 0.7486 - val_concordance_correlation_coefficient: 0.2248 - val_cosine_similarity: 0.7944 - val_loss: -0.2194 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.2452e-05 - val_pearson_correlation: 0.3359 - val_pearson_correlation_log: 0.5213 - learning_rate: 1.0000e-04
+Epoch 8/60
+[1m650/650[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m74s[0m 113ms/step - concordance_correlation_coefficient: 0.5757 - cosine_similarity: 0.8661 - loss: -0.5618 - mean_absolute_error: 0.0014 - mean_squared_error: 1.2264e-05 - pearson_correlation: 0.6689 - pearson_correlation_log: 0.7622 - val_concordance_correlation_coefficient: 0.2355 - val_cosine_similarity: 0.7899 - val_loss: -0.2164 - val_mean_absolute_error: 0.0019 - val_mean_squared_error: 2.2310e-05 - val_pearson_correlation: 0.3417 - val_pearson_correlation_log: 0.5260 - learning_rate: 2.5000e-05
