@@ -36,3 +36,24 @@ crested.tl.evaluate(
     model='Finetuned model',
     metrics=crested.tl.default_configs('peak_regression_mean')
 )
+
+
+crested.tl.evaluate(
+    adata_specific,
+    model='Base model',
+    metrics=crested.tl.default_configs('peak_regression_mean')
+)
+
+crested.pl.corr.violin(adata_specific)
+plt.savefig("output/CREsted_Evaluation/Correlation_Violin_Plots.png")
+plt.close()
+
+crested.pl.corr.heatmap(
+    adata_specific,
+    split="test",
+    log_transform=True,
+    vmax=1,
+    vmin=0,
+)
+plt.savefig("output/CREsted_Evaluation/Model_CellTypeHeatMap.png")
+plt.close()

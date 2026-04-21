@@ -24,6 +24,6 @@ conda activate Crested
 
 # 3. Run the training script
 echo "Starting CREsted Training..."
-python /scratch/rprest2/Enhancer-Creation/Scripts/Crested_Training.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03_Crested_Base_Training.py
 
 echo "Training job finished."

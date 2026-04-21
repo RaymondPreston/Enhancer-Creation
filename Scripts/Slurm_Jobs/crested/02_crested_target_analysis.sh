@@ -19,6 +19,6 @@ conda init bash > /dev/null 2>&1
 source ~/.bashrc  
 conda activate Crested
 
-python /scratch/rprest2/Enhancer-Creation/Scripts/Crested_Target_Analysis.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/02_Crested_PP_Target_Analysis.py
 
 echo "Analysis complete. Check the output/ directory for results."

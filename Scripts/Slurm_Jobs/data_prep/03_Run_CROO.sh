@@ -24,4 +24,4 @@ source ~/.bashrc
 conda activate /users/rprest2/.conda/envs/Enhancer-Creation
 
 # Run the python wrapper script
-python /scratch/rprest2/Enhancer-Creation/Scripts/Run_CROO.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/01_Data_Processing/03_Run_CROO.py

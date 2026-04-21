@@ -23,8 +23,8 @@ source ~/.bashrc                       # Source the .bashrc file [cite: 587]
 conda activate /users/rprest2/.conda/envs/Enhancer-Creation
 
 # Execute the Python script
-python /scratch/rprest2/Enhancer-Creation/Scripts/Download_Data.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/01_Data_Processing/01_Download_Data.py
 
 # Execute the Python script for the specific array task ID
 # The Python script will pick sra_files[SLURM_ARRAY_TASK_ID]
-python /scratch/rprest2/Enhancer-Creation/Scripts/Unpack_SRA.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/01_Data_Processing/02_Unpack_SRA.py
