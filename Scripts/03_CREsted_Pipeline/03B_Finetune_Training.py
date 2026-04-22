@@ -51,7 +51,7 @@ trainer = crested.tl.Crested(
     data=datamodule,
     model=base_model,
     config=config,
-    project_name="Base_CNN_Training",  # change to your liking
+    project_name="KPC_Metastasis_Enhancer",  # change to your liking
     run_name="TI_01_Finetune_Model_Training_v1",  # change to your liking
     logger="wandb",  # or 'wandb', 'tensorboard'
 )

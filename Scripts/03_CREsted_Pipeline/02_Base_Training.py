@@ -14,6 +14,18 @@ adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/0
 
 print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
 
+genome = crested.Genome(
+        fasta="/scratch/rprest2/indices/mm10_encode.fa",
+        chrom_sizes="/scratch/rprest2/indices/mm10_no_alt.chrom.sizes.tsv")
+crested.register_genome(genome)
+
+# Create the Data Module
+print("Initializing Data Module...")
+datamodule = AnnDataModule(adata, 
+                        batch_size = 128,
+                        max_stochastic_shift=3,
+                        always_reverse_complement=True
+)
 
 # Define the Model Architecture
 # seq_len is 2114 as per the preprocessing script change_regions_width
@@ -35,9 +47,10 @@ trainer = Crested(
     data=datamodule,
     model=model,
     config=configs,
-    project_name="Base_CNN_Training",
-    run_name="TI_01_Base_Model_Training_v1",
-    seed=8 #Note that there will still be a degree of randomness in training due to GPU nondeterminism operations
+    project_name="KPC_Metastasis_Enhancer",
+    run_name="BM_01TS_prmean_2114",
+    seed=8,
+    logger="wandb"  #Note that there will still be a degree of randomness in training due to GPU nondeterminism operations
 )
 
 # Start Training
@@ -45,6 +58,6 @@ print("Starting model training...")
 # You can adjust the number of epochs or early stopping parameters as needed
 trainer.fit(epochs=60,
             learning_rate_reduce_patience=5,
-            save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models"
+            save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114"
 )
 print("Training complete. Models and logs are saved in the project directory.")

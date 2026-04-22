@@ -10,7 +10,11 @@
 #SBATCH --partition=b200-8-gm1432-c192-m2048
 #SBATCH --gpus=1
 
-#Currently set up for CPU usage. Will need to change once I need GPU
+# Send email notifications
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=rprest2@emory.edu 
 
 # Create logs directory if it doesn't exist
 mkdir -p logs

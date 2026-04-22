@@ -58,5 +58,5 @@ trainer.fit(
     epochs=60,
     learning_rate_reduce_patience=5,
     early_stopping_patience=6,
-    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/TI_01_Finetune_Model_Training_v1"
+    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM01_FTDA_Finetune_Model_Training"
 )

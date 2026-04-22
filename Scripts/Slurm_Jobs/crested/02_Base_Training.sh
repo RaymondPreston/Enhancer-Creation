@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8                              # We need multiple CPUs to handle the on-the-fly data generation/shifting
 #SBATCH --mem=64G                                      # High memory to load the entire .h5ad AnnData object into RAM
 #SBATCH --time=24:00:00                                # Deep learning takes time; giving it 24 hours to be safe
-#SBATCH --partition=a100-8-gm320-c96-m1152             # MUST BE A GPU PARTITION (Check your cluster's specific GPU partition name)
+#SBATCH --partition=b200-8-gm1432-c192-m2048             # MUST BE A GPU PARTITION (Check your cluster's specific GPU partition name)
 #SBATCH --gpus=1                                       # Request exactly 1 GPU
 
 
@@ -24,6 +24,6 @@ conda activate Crested
 
 # 3. Run the training script
 echo "Starting CREsted Training..."
-python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03_Crested_Base_Training.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/02_Base_Training.py
 
 echo "Training job finished."
