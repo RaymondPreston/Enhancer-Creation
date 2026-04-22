@@ -24,6 +24,6 @@ mkdir -p logs
 echo "Starting CREsted Finetune Training..."
 
 # Run the Python script using the Crested environment
-conda run -n Crested python Scripts/Crested_Finetune_Training.py
+conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03B_Finetune_Training.py
 
 echo "Finetuning job complete."
