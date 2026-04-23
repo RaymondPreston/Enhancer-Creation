@@ -20,7 +20,7 @@ genome = crested.Genome(
         chrom_sizes="/scratch/rprest2/indices/mm10_no_alt.chrom.sizes.tsv")
 crested.register_genome(genome)
 
-base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/checkpoints/15.keras")
+base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114/checkpoints/12.keras")
 
 
 #Here I will use the fine tuning training set based on methigh and metlow DA peaks.
@@ -49,8 +49,8 @@ trainer = crested.tl.Crested(
     data=datamodule,
     model=base_model,
     config=config,
-    project_name="KPC_Metastasis_Analysis",
-    run_name="DApeaks_DilatedCNN_Finetune_v1",
+    project_name="KPC_Metastasis_Enhancer",
+    run_name="BM_01TS_prmean_2114_ep12__FT_DA8414_LR1e-4",
     logger="wandb",  # or 'wandb', 'tensorboard'
 )
 
@@ -58,5 +58,5 @@ trainer.fit(
     epochs=60,
     learning_rate_reduce_patience=5,
     early_stopping_patience=6,
-    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM01_FTDA_Finetune_Model_Training"
+    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114_ep12__FT_DA8414_LR1e-4"
 )
