@@ -10,17 +10,18 @@ import pandas as pd
 
 
 print("Loading preprocessed dataset...")
-# Load the preprocessed anndata
-adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad")
-
-print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
+# Load the proccessed anndata object from 03C_Generate_Finetune_AnnData.py
+adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_training_set.h5ad")
+adata_specific = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_finetune_DA_peaks.h5ad")
+print(f"Base Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
+print(f"Fine Tune Data loaded: {adata_specific.n_vars} peaks across {adata_specific.n_obs} samples.")
 
 genome = crested.Genome(
         fasta="/scratch/rprest2/indices/mm10_encode.fa",
         chrom_sizes="/scratch/rprest2/indices/mm10_no_alt.chrom.sizes.tsv")
 crested.register_genome(genome)
 
-base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114/checkpoints/12.keras")
+base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/BM_02TS_prmean_2114_nonorm/checkpoints/10.keras")
 
 
 #Here I will use the fine tuning training set based on methigh and metlow DA peaks.
@@ -28,8 +29,6 @@ base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/
 #Something to note is that the DA peaks are a different length than the peaks used in base model training
 #This is handled in @/scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03C_Generate_Finetune_AnnData.py
 #Note, that script is AI generated however I am convinced that the script does what I want it to do with the appropriate QC.
-
-adata_specific = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_finetune_DA_peaks.h5ad")
 
 datamodule = crested.tl.data.AnnDataModule(
     adata_specific,
@@ -50,7 +49,7 @@ trainer = crested.tl.Crested(
     model=base_model,
     config=config,
     project_name="KPC_Metastasis_Enhancer",
-    run_name="BM_01TS_prmean_2114_ep12__FT_DA8414_LR1e-4",
+    run_name="BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414_LR1e-4-4",
     logger="wandb",  # or 'wandb', 'tensorboard'
 )
 
@@ -58,5 +57,5 @@ trainer.fit(
     epochs=60,
     learning_rate_reduce_patience=5,
     early_stopping_patience=6,
-    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114_ep12__FT_DA8414_LR1e-4"
+    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414_LR1e-4"
 )

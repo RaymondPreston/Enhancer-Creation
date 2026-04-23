@@ -1,17 +1,4 @@
-"""
-03C_Generate_Finetune_AnnData.py
-----------------------------
-Subsets the base training AnnData (01_training_set.h5ad) to exactly the
-8,414 DESeq2 differentially accessible (DA) peaks.
-
-Naming Convention for Downstream Modeling:
-- PROJECT_NAME: KPC_Metastasis_Analysis
-- RUN_NAME: [DataSubset]_[ModelType]_[Version]
-    - DataSubset: DApeaks (Differentially Accessible)
-    - ModelType: DilatedCNN
-    - Version: v1, v2...
-Recommended for this run: "DApeaks_DilatedCNN_Finetune_v1"
-"""
+#Setup to 
 
 import os
 import subprocess
@@ -19,12 +6,8 @@ import io
 import anndata as ad
 import pandas as pd
 
-# ── Naming Convention ────────────────────────────────────────────────────────
-PROJECT_NAME = "KPC_Metastasis_Analysis"
-RUN_NAME     = "DApeaks_DilatedCNN_Finetune_v1"
-
 # ── Paths ─────────────────────────────────────────────────────────────────────
-ADATA_PATH   = "/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad"
+ADATA_PATH   = "/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_training_set.h5ad"
 DA_TSV_PATH  = "/scratch/rprest2/Enhancer-Creation/output/DA_peaks_for_finetune.tsv"
 OUTPUT_PATH  = "/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_finetune_DA_peaks.h5ad"
 

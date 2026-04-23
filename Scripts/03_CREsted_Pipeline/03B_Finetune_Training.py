@@ -1,3 +1,5 @@
+#Setup to train on non-normalized data.
+
 import os
 import anndata as ad
 import crested
@@ -9,8 +11,8 @@ import matplotlib.pyplot as plt
 
 
 print("Loading preprocessed dataset...")
-# Load the preprocessed anndata
-adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad")
+# Load the base training set
+adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_training_set.h5ad")
 
 print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
 
@@ -19,10 +21,10 @@ genome = crested.Genome(
         chrom_sizes="/scratch/rprest2/indices/mm10_no_alt.chrom.sizes.tsv")
 crested.register_genome(genome)
 
-base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114/checkpoints/12.keras")
+base_model = crested.utils.load_model("/scratch/rprest2/Enhancer-Creation/input/training_models/BM_02TS_prmean_2114_nonorm/checkpoints/10.keras")
 
 crested.pl.qc.filter_cutoff(adata, cutoffs=[1.5, 1, 0.5], width=8, height=6)
-plt.savefig("output/CREsted_PreProcess/Gini_Cutoff.png")
+plt.savefig("output/CREsted_PreProcess/02_Gini_Cutoff.png")
 plt.close()
 
 #Based on gini_cutoff plot, we will use a gini cut off of 1 to filter out majority of consensus peaks. All peaks 1 STD away from mean gini are kept
@@ -31,7 +33,7 @@ plt.close()
 adata_specific = crested.pp.filter_regions_on_specificity(adata, gini_std_threshold=1.0, inplace=False)
 adata_specific
 
-adata_specific.write_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_a_ft_training_set.h5ad")
+adata_specific.write_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_a_ft_Gini_training_set.h5ad")
 
 datamodule = crested.tl.data.AnnDataModule(
     adata_specific,
@@ -52,7 +54,7 @@ trainer = crested.tl.Crested(
     model=base_model,
     config=config,
     project_name="KPC_Metastasis_Enhancer",  # change to your liking
-    run_name="BM_01TS_prmean_2114_ep12__FT_Gini-1_LR1e-4",  # change to your liking
+    run_name="BM_02TS_prmean_2114_nonorm_ep10__FT_Gini-1_LR1e-4",  # change to your liking
     logger="wandb",  # or 'wandb', 'tensorboard'
 )
 
@@ -60,5 +62,5 @@ trainer.fit(
     epochs=60,
     learning_rate_reduce_patience=5,
     early_stopping_patience=6,
-    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114_ep12__FT_Gini-1_LR1e-4"
+    save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_02TS_prmean_2114_nonorm_ep10__FT_Gini-1_LR1e-4"
 )

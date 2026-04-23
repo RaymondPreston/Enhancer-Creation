@@ -5,9 +5,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH --time=04:00:00
-#SBATCH --partition=c128-m1024
+#SBATCH --partition=c64-m512
+
 
 # Create logs directory if it doesn't exist
 mkdir -p logs
@@ -15,6 +16,6 @@ mkdir -p logs
 echo "Starting CREsted preprocessing..."
 
 # Run the Python script using the Crested environment
-conda run -n Crested python Scripts/Crested_Preprocessing.py
+conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/01A_Preprocessing.py
 
 echo "Preprocessing complete. Check output/CREsted_PreProcess/ for plots and input/training_inputs/ for the h5ad file."

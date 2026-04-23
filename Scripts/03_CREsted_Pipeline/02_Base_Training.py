@@ -1,3 +1,5 @@
+#Currently set up for models trained on Crested non-normalized data.
+
 import os
 import anndata as ad
 import crested
@@ -10,7 +12,7 @@ import numpy as np
 
 print("Loading preprocessed dataset...")
 # Load the preprocessed anndata
-adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad")
+adata = ad.read_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_training_set.h5ad")
 
 print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
 
@@ -48,7 +50,7 @@ trainer = Crested(
     model=model,
     config=configs,
     project_name="KPC_Metastasis_Enhancer",
-    run_name="BM_01TS_prmean_2114",
+    run_name="BM_02TS_prmean_2114_nonorm",
     seed=8,
     logger="wandb"  #Note that there will still be a degree of randomness in training due to GPU nondeterminism operations
 )
@@ -58,6 +60,6 @@ print("Starting model training...")
 # You can adjust the number of epochs or early stopping parameters as needed
 trainer.fit(epochs=60,
             learning_rate_reduce_patience=5,
-            save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_01TS_prmean_2114"
+            save_dir="/scratch/rprest2/Enhancer-Creation/input/training_models/BM_02TS_prmean_2114_nonorm"
 )
 print("Training complete. Models and logs are saved in the project directory.")

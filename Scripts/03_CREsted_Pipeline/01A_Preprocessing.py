@@ -1,3 +1,6 @@
+#Currently set up for models trained on non-normalized data.
+
+
 import anndata as ad
 import pandas as pd
 import crested
@@ -62,16 +65,16 @@ plt.savefig("output/CREsted_PreProcess/top_k_diagnostic.svg", bbox_inches="tight
 plt.close()
 
 #Normalize peaks. top_k_percent=0.03 is what the CREsted tutorial uses, however I should look into this further
-crested.pp.normalize_peaks(adata, top_k_percent=0.03)
+#crested.pp.normalize_peaks(adata, top_k_percent=0.03)
 
 #Need to save these graphs to output/CREsted_PreProcess/ 
 
-crested.pl.qc.normalization_weights(adata, title="Post-Process-Normalization weights per cell type", xtick_rotation=90)
-plt.savefig("output/CREsted_PreProcess/Post-Process-normalization_weights.png", bbox_inches="tight")
-plt.close()
+#crested.pl.qc.normalization_weights(adata, title="Post-Process-Normalization weights per cell type", xtick_rotation=90)
+#plt.savefig("output/CREsted_PreProcess/Post-Process-normalization_weights.png", bbox_inches="tight")
+#plt.close()
 
 crested.pl.corr.heatmap_self(adata, log_transform=True, vmin=0, vmax=1, reorder=True)
-plt.savefig("output/CREsted_PreProcess/Post-Process-correlation_heatmap.png", bbox_inches="tight")
+plt.savefig("output/CREsted_PreProcess/02Post-Process-correlation_heatmap.png", bbox_inches="tight")
 plt.close()
 
 crested.pp.train_val_test_split(
@@ -85,4 +88,4 @@ print(f"Data loaded: {adata.n_vars} peaks across {adata.n_obs} samples.")
 
 # Save the final preprocessing results
 os.makedirs("/scratch/rprest2/Enhancer-Creation/input/training_inputs", exist_ok=True)  
-adata.write_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/01_training_set.h5ad")
+adata.write_h5ad("/scratch/rprest2/Enhancer-Creation/input/training_inputs/02_training_set.h5ad")

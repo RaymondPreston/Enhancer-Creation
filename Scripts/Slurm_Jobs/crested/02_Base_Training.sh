@@ -22,6 +22,14 @@ echo "Activating Conda Environment..."
 source ~/.bashrc  # Or whatever script initializes your conda
 conda activate Crested
 
+echo "Starting CREsted preprocessing..."
+
+# Run the Python script using the Crested environment
+conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/01A_Preprocessing.py
+
+echo "Preprocessing complete. Check output/CREsted_PreProcess/ for plots and input/training_inputs/ for the h5ad file."
+
+
 # 3. Run the training script
 echo "Starting CREsted Training..."
 python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/02_Base_Training.py
