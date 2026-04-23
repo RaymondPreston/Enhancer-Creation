@@ -16,6 +16,6 @@ mkdir -p logs
 echo "Starting CREsted preprocessing..."
 
 # Run the Python script using the Crested environment
-conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/04_Evaluation.py
+conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/04_02Model_Evaluation.py
 
 echo "Model evaluation complete. Check output folder for results."
