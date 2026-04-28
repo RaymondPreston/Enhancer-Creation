@@ -36,7 +36,7 @@ crested.pp.change_regions_width(adata, width=2114)
 
 os.makedirs("output/CREsted_PreProcess", exist_ok=True)
 
-# Test which top_k_percent is optimal
+# Test which top_k_percent is optimal for normalize_peaks
 top_k_values = [0.01, 0.02, 0.03, 0.05, 0.10]
 scaling_factors = {}
 

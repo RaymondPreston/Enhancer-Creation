@@ -1,4 +1,5 @@
 #import required packages
+install.packages("ggrepel", repos="http://cran.us.r-project.org")
 library(DiffBind)
 library(DESeq2)
 library(rtracklayer)
@@ -72,4 +73,43 @@ log2mat = t(scale(t(log2mat)))
 pdf("output/KPC_Consensus_Heatmap.pdf")
 Heatmap(log2mat, show_row_names = FALSE, cluster_rows = FALSE)
 dev.off()
+
+#Export the differentially accessible peaks to .tsv file for use in generating finetune dataset
+
+# Assign da_class
+anno_df$da_class <- ifelse(anno_df$Fold < 0, "met_high", "met_low")
+
+cat(sprintf("\nda_class breakdown:\n  met_high (Fold < 0): %d\n  met_low  (Fold > 0): %d\n",
+    sum(anno_df$da_class == "met_high"),
+    sum(anno_df$da_class == "met_low")))
+
+# Build 2114 bp peak ID (0-based, centered on Tn5 summit)
+# DiffBind with summits=250 produces 501 bp peaks (1-based GRanges coordinates).
+# Summit position (0-based) = (start_1based - 1) + 250
+# 2114 bp window = summit - 1057 to summit + 1057
+summit_0based <- (anno_df$start - 1) + 250
+anno_df$peak_id_2114bp <- paste0(
+    anno_df$seqnames, ":",
+    summit_0based - 1057, "-",
+    summit_0based + 1057
+)
+
+# Export
+out_df <- anno_df[, c(
+    "peak_id_2114bp",
+    "seqnames", "start", "end",
+    "Fold", "FDR", "da_class",
+    "Conc_Hi", "Conc_Lo",
+    "SYMBOL", "annotation", "distanceToTSS"
+)]
+
+write.table(
+    out_df,
+    file      = "output/DA_peaks_for_finetune_02.tsv",
+    sep       = "\t",
+    quote     = FALSE,
+    row.names = FALSE
+)
+
+cat(sprintf("\nSaved: output/DA_peaks_for_finetune.tsv  (%d peaks)\n", nrow(out_df)))
            

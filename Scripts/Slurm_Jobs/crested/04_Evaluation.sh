@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=01:00:00
-#SBATCH --partition=b200-8-gm1432-c192-m2048
+#SBATCH --partition=rp6b-1-gm96-c8-m64
 #SBATCH --gpus=1
 
 # Create logs directory if it doesn't exist

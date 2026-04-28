@@ -12,6 +12,6 @@
 
 # 2. Run the Consensus Peaks R script
 echo "Running Generate_Consensus_Peaks.R..."
-conda run -n Enhancer-Creation Rscript Scripts/Generate_Consensus_Peaks.R
+conda run -n Enhancer-Creation Rscript /scratch/rprest2/Enhancer-Creation/Scripts/02_Peak_Analysis/01_Generate_Consensus_Peaks.R
 
 echo "Done."
