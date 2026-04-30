@@ -253,19 +253,3 @@ for i, (pred, label) in enumerate(zip(LSD_predictions, seq_labels)):
     print(f"[04] Saved: LSD_Enhancer_{label}.png")
 
 #The last thing to validate here is to ensure the model is learning TF motif patterns in met-high and met-low using tfmodisco.
-
-
-#Synthetic Enhancer design 
-
-#Establish nucleotide distribution
-acgt_distribution = crested.utils.calculate_nucleotide_distribution(
-    adata_specific,  # accepts any sequence input, same as before
-    per_position=True,  # return a distirbution per position in the sequence
-)
-acgt_distribution.shape
-
-#We can not use the default optimizer _weighted_difference because it expects a single target input (int)
-#Our goal should be to maximize accessibility in methigh subclones while minimizing accessibility in metlow subclones
-
-def 
-
