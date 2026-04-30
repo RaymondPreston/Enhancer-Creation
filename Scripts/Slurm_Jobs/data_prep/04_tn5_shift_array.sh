@@ -27,16 +27,20 @@ if [ -f "$OUTPUT_BAM" ]; then
     exit 0
 fi
 
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate encd-atac
+
 # 1. Index input if missing
 if [ ! -f "${BAM_FILE}.bai" ] && [ ! -f "${BAM_FILE%.bam}.bai" ]; then
     echo "Indexing missing input BAM..."
-    conda run -n encd-atac samtools index "$BAM_FILE"
+    samtools index "$BAM_FILE"
 fi
 
 # 2. Perform Tn5 shift (+4/-5bp)
 echo "Running alignmentSieve..."
 # Note: alignmentSieve output is often unsorted/out of order after shifting
-conda run -n encd-atac alignmentSieve \
+alignmentSieve \
     --numberOfProcessors $SLURM_CPUS_PER_TASK \
     --ATACshift \
     --bam "$BAM_FILE" \
@@ -44,14 +48,14 @@ conda run -n encd-atac alignmentSieve \
 
 # 3. Sort the shifted BAM
 echo "Sorting shifted BAM..."
-conda run -n encd-atac samtools sort \
+samtools sort \
     -@ $SLURM_CPUS_PER_TASK \
     -o "$OUTPUT_BAM" \
     "${OUTPUT_BAM}.unsorted"
 
 # 4. Index the shifted BAM
 echo "Indexing shifted output..."
-conda run -n encd-atac samtools index "$OUTPUT_BAM"
+samtools index "$OUTPUT_BAM"
 
 # Cleanup
 rm "${OUTPUT_BAM}.unsorted"

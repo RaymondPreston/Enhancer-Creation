@@ -21,7 +21,7 @@ conda init bash > /dev/null 2>&1
 source ~/.bashrc
 
 # Activate environment containing croo
-conda activate /users/rprest2/.conda/envs/Enhancer-Creation
+conda activate Enhancer-Creation
 
 # Run the python wrapper script
 python /scratch/rprest2/Enhancer-Creation/Scripts/01_Data_Processing/03_Run_CROO.py

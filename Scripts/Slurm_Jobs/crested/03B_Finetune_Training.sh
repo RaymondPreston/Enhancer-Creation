@@ -21,16 +21,21 @@
 # Create logs directory if it doesn't exist
 mkdir -p logs
 
+echo "Activating Conda Environment..."
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate Crested
+
 echo "Starting CREsted Gini Finetune Training..."
-# Run the Python script using the Crested environment
-conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03B_Finetune_Training.py
+# Run the Python script
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03B_Finetune_Training.py
 echo "Finetuning job complete."
 
 echo "Starting Finetune AnnData Generation..."
-conda run -n Crested python Scripts/03_CREsted_Pipeline/03C_Generate_Finetune_AnnData.py
+python Scripts/03_CREsted_Pipeline/03C_Generate_Finetune_AnnData.py
 echo "Finetune AnnData generation complete."
 
 echo "Starting Finetune Analysis on DA peaks..."
 # Run the python script
-conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03D_Finetune_Training.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/03D_Finetune_Training.py
 echo "Finetuning complete. Check output/training_models/ for results."

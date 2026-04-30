@@ -15,7 +15,11 @@ mkdir -p logs
 
 echo "Starting CREsted preprocessing..."
 
-# Run the Python script using the Crested environment
-conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/01A_Preprocessing.py
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate Crested
+
+# Run the Python script
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/01A_Preprocessing.py
 
 echo "Preprocessing complete. Check output/CREsted_PreProcess/ for plots and input/training_inputs/ for the h5ad file."

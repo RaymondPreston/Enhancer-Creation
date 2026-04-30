@@ -14,7 +14,11 @@ mkdir -p logs
 
 echo "Starting Gini-QC analysis..."
 
-# Run the R script using the Crested_QC environment
-conda run -n Crested_QC Rscript Scripts/03_CREsted_Pipeline/03A_Finetune_Gini_Validation.R
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate Crested_QC
+
+# Run the R script
+Rscript Scripts/03_CREsted_Pipeline/03A_Finetune_Gini_Validation.R
 
 echo "Gini-QC analysis complete. Check output/Gini_QC/ for results."

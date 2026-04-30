@@ -1,5 +1,4 @@
 #import required packages
-install.packages("ggrepel", repos="http://cran.us.r-project.org")
 library(DiffBind)
 library(DESeq2)
 library(rtracklayer)

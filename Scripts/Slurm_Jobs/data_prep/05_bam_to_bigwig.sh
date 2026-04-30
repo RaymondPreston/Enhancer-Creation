@@ -26,8 +26,12 @@ echo "Task ID: $SLURM_ARRAY_TASK_ID"
 echo "Processing: $BAM_FILE"
 echo "Output: $OUTPUT_BW"
 
-# Run bamCoverage using the encd-atac environment
-conda run -n encd-atac bamCoverage \
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate encd-atac
+
+# Run bamCoverage
+bamCoverage \
   -b "$BAM_FILE" \
   -o "$OUTPUT_BW" \
   --normalizeUsing CPM \

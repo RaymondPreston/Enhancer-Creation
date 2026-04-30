@@ -15,7 +15,11 @@ mkdir -p logs
 
 echo "Starting Enhancer Generation (In-Silico Evolution)..."
 
-# Run the Python script using the Crested environment
-conda run -n Crested python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/05b_Enhancer_Generation.py
+conda init bash > /dev/null 2>&1
+source ~/.bashrc
+conda activate Crested
+
+# Run the Python script
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/05b_Enhancer_Generation.py
 
 echo "Enhancer generation complete."

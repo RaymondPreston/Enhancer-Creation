@@ -20,7 +20,7 @@ conda init bash > /dev/null 2>&1
 source ~/.bashrc                       # Source the .bashrc file [cite: 587]
 
 # Activate your specific conda environment (Uncomment and replace 'myenv' if you use one) 
-conda activate /users/rprest2/.conda/envs/Enhancer-Creation
+conda activate Enhancer-Creation
 
 # Execute the Python script
 python /scratch/rprest2/Enhancer-Creation/Scripts/01_Data_Processing/01_Download_Data.py
