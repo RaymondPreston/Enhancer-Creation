@@ -9,6 +9,9 @@ library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(org.Mm.eg.db)
 library(ComplexHeatmap)
 library(dplyr)
+library(Biostrings)
+library(Rsamtools)
+library(GenomicRanges)
 
 #cluster all KPC samples together, compare metastatic vs. nonmetastatic
 #import sample sheet
@@ -17,8 +20,7 @@ samples_all = read.csv("diffbind_sample_sheet_KPC_all_no_H10.csv")
 #read in peaksets
 KPC_all = dba(sampleSheet=samples_all)
 
-#generate insertion counts matrix
-KPC_all_counts = dba.count(KPC_all, summits = 250)
+
 
 # Extract the full consensus peak set (all peaks, not just DA)
 if (!file.exists("input/consensus_peaks_all.bed")) {
@@ -29,49 +31,60 @@ if (!file.exists("input/consensus_peaks_all.bed")) {
     print("consensus_peaks_all.bed already exists in input/, skipping export.")
 }
 
-#normalize by total reads in peaks
-KPC_all_counts_norm_trip = dba.normalize(KPC_all_counts, library=DBA_LIBSIZE_PEAKREADS)
+# --- THE CHECKPOINT ---
+if (file.exists("/scratch/rprest2/Enhancer-Creation/output/annotated_complete_peakset_no_H10.RDS")) {
+  
+  cat("\nCheckpoint found! Loading pre-calculated differential peaks...\n")
+  anno_df <- readRDS("/scratch/rprest2/Enhancer-Creation/output/annotated_differentially_accessible_peaks_no_H10.RDS")
+} else {
+    #generate insertion counts matrix
+    KPC_all_counts = dba.count(KPC_all, summits = 250)
+  
+    cat("\nNo checkpoint found. Running heavy differential analysis...\n")
+    #normalize by total reads in peaks
+    KPC_all_counts_norm_trip = dba.normalize(KPC_all_counts, library=DBA_LIBSIZE_PEAKREADS)
 
-#perform differential accessibility analysis comparing metastatic to non-metastatic samples using matrix normalized by trip
-KPC_all_counts_norm_trip_DA = dba.contrast(KPC_all_counts_norm_trip, design="~Tissue + Condition")
-KPC_all_counts_norm_trip_DA = dba.analyze(KPC_all_counts_norm_trip_DA)
+    #perform differential accessibility analysis comparing metastatic to non-metastatic samples using matrix normalized by trip
+    KPC_all_counts_norm_trip_DA = dba.contrast(KPC_all_counts_norm_trip, design="~Tissue + Condition")
+    KPC_all_counts_norm_trip_DA = dba.analyze(KPC_all_counts_norm_trip_DA)
 
-dba.show(KPC_all_counts_norm_trip_DA, bContrasts=TRUE)
+    dba.show(KPC_all_counts_norm_trip_DA, bContrasts=TRUE)
 
-met_vs_nonmet_trip.DB = dba.report(KPC_all_counts_norm_trip_DA, th=0.05, contrast=2)
-met_vs_nonmet_trip.DB = met_vs_nonmet_trip.DB[order(met_vs_nonmet_trip.DB$Fold, decreasing=TRUE),]
-met_vs_nonmet_trip.DB_up = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold>0,]
-met_vs_nonmet_trip.DB_down = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold<0,]
-met_vs_nonmet_trip.DB_complete <- dba.report(KPC_all_counts_norm_trip_DA, th=1, contrast=2)
+    met_vs_nonmet_trip.DB = dba.report(KPC_all_counts_norm_trip_DA, th=0.05, contrast=2)
+    met_vs_nonmet_trip.DB = met_vs_nonmet_trip.DB[order(met_vs_nonmet_trip.DB$Fold, decreasing=TRUE),]
+    met_vs_nonmet_trip.DB_up = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold>0,]
+    met_vs_nonmet_trip.DB_down = met_vs_nonmet_trip.DB[met_vs_nonmet_trip.DB$Fold<0,]
+    met_vs_nonmet_trip.DB_complete <- dba.report(KPC_all_counts_norm_trip_DA, th=1, contrast=2)
 
-#annotate peaks
-dir.create("output", showWarnings = FALSE)
+    #annotate peaks
+    dir.create("output", showWarnings = FALSE)
 
-anno = annotatePeak(met_vs_nonmet_trip.DB,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
-anno_df = as.data.frame(anno)
-anno_df = anno_df[order(anno_df$Fold),]
-saveRDS(anno_df, file = "output/annotated_differentially_accessible_peaks_no_H10.RDS")
+    anno = annotatePeak(met_vs_nonmet_trip.DB,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
+    anno_df = as.data.frame(anno)
+    anno_df = anno_df[order(anno_df$Fold),]
+    saveRDS(anno_df, file = "output/annotated_differentially_accessible_peaks_no_H10.RDS")
 
-anno_complete = annotatePeak(met_vs_nonmet_trip.DB_complete,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
-anno_complete_df <- as.data.frame(anno_complete)
-anno_complete_df = anno_complete_df[order(-anno_complete_df$Fold),]
-saveRDS(anno_complete_df, file = "output/annotated_complete_peakset_no_H10.RDS")
+    anno_complete = annotatePeak(met_vs_nonmet_trip.DB_complete,  TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, annoDb="org.Mm.eg.db")
+    anno_complete_df <- as.data.frame(anno_complete)
+    anno_complete_df = anno_complete_df[order(-anno_complete_df$Fold),]
+    saveRDS(anno_complete_df, file = "output/annotated_complete_peakset_no_H10.RDS")
 
-#generate heatmap
-report_df = as.data.frame(met_vs_nonmet_trip.DB)
-report_df <- report_df[order(-report_df$Fold),]
-counts <- dba.peakset(KPC_all_counts_norm_trip_DA, bRetrieve=T, DataType=DBA_DATA_FRAME)
-differential_peaks = as.numeric(rownames(report_df))
-differential_peak_counts = counts[differential_peaks,]
-differential_peak_counts <- differential_peak_counts[,-c(1,2,3)]
+    #generate heatmap
+    report_df = as.data.frame(met_vs_nonmet_trip.DB)
+    report_df <- report_df[order(-report_df$Fold),]
+    counts <- dba.peakset(KPC_all_counts_norm_trip_DA, bRetrieve=T, DataType=DBA_DATA_FRAME)
+    differential_peaks = as.numeric(rownames(report_df))
+    differential_peak_counts = counts[differential_peaks,]
+    differential_peak_counts <- differential_peak_counts[,-c(1,2,3)]
 
-mat = data.matrix(differential_peak_counts)
-log2mat = log2(1+mat)
-log2mat = t(scale(t(log2mat)))
+    mat = data.matrix(differential_peak_counts)
+    log2mat = log2(1+mat)
+    log2mat = t(scale(t(log2mat)))
 
-pdf("output/KPC_Consensus_Heatmap.pdf")
-Heatmap(log2mat, show_row_names = FALSE, cluster_rows = FALSE)
-dev.off()
+    pdf("output/KPC_Consensus_Heatmap.pdf")
+    Heatmap(log2mat, show_row_names = FALSE, cluster_rows = FALSE)
+    dev.off()
+}
 
 #Export the differentially accessible peaks to .tsv file for use in generating finetune dataset
 
@@ -110,5 +123,57 @@ write.table(
     row.names = FALSE
 )
 
-cat(sprintf("\nSaved: output/DA_peaks_for_finetune.tsv  (%d peaks)\n", nrow(out_df)))
-           
+cat(sprintf("\nSaved: output/DA_peaks_for_finetune_02.tsv  (%d peaks)\n", nrow(out_df)))
+
+
+
+
+# Generating DNA-Diffusion Input
+
+cat("\n--- Generating DNA-Diffusion Input ---\n")
+
+# 1. Path to your unzipped ENCODE mm10 fasta
+fasta_file <- "/scratch/rprest2/indices/mm10_encode.fa" 
+fa <- FaFile(fasta_file)
+
+# 2. Calculate the exact center of the DiffBind peaks
+# DiffBind summits=250 means peaks are 501bp wide.
+centers <- anno_df$start + floor((anno_df$end - anno_df$start) / 2)
+
+# Create 200bp windows (100bp upstream, 99bp downstream = 200bp total)
+seq_starts <- centers - 100
+seq_ends <- centers + 99 
+
+# Create a GRanges object specifically for these 200bp windows
+gr_200bp <- GRanges(
+  seqnames = anno_df$seqnames,
+  ranges = IRanges(start = seq_starts, end = seq_ends)
+)
+
+# 3. Extract the DNA sequences directly from the FASTA file
+cat("Extracting 200bp sequences from genome FASTA...")
+sequences <- getSeq(fa, gr_200bp)
+seq_character <- as.character(sequences)
+
+# 4. Build the dataframe required by DNA-Diffusion
+dna_diff_df <- data.frame(
+  chr = as.character(seqnames(gr_200bp)),
+  sequence = toupper(seq_character),
+  TAG = anno_df$da_class,      # Maps to your "met_high" or "met_low"
+  start = seq_starts,          # Optional metadata
+  end = seq_ends,              # Optional metadata
+  stringsAsFactors = FALSE
+)
+
+# 6. Export to TSV format
+output_path <- "/scratch/rprest2/Enhancer-Creation/input/training_inputs/DNA_Diffusion_Input.tsv"
+write.table(
+  dna_diff_df[, c("chr", "sequence", "TAG", "start", "end")],
+  file = output_path,
+  sep = "\t",
+  quote = FALSE,
+  row.names = FALSE
+)
+
+cat(sprintf("Success! Exported %d formatted sequences to %s\n", 
+            nrow(dna_diff_df), output_path))

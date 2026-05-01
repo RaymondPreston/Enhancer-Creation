@@ -4,9 +4,9 @@
 #SBATCH --error=logs/TF_Motif%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=08:00:00
+#SBATCH --time=24:00:00
 #SBATCH --partition=rp6b-8-gm768-c192-m2048
 #SBATCH --gpus=1
 
