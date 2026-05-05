@@ -5,9 +5,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=48G
+#SBATCH --mem=32G
 #SBATCH --time=12:00:00
-#SBATCH --partition=b200-8-gm1432-c192-m2048
+#SBATCH --partition=l4-4-gm96-c48-m192
 #SBATCH --gpus=1
 
 # Create logs directory if it doesn't exist
@@ -20,6 +20,6 @@ source ~/.bashrc
 conda activate Crested
 
 # Run the Python script
-python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/05b_Enhancer_Generation.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/03_CREsted_Pipeline/05D_Enhancer_Generation.py
 
 echo "Enhancer generation complete."

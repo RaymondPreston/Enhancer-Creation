@@ -169,7 +169,7 @@ kpc2_lo_idx = np.array([s.startswith("KPC-2") and "_Lo" in s for s in adata_spec
 cos_hi_array = np.array([1.0 if "_Hi" in s else 0.0 for s in adata_specific.obs_names])
 cos_lo_array = np.array([1.0 if "_Lo" in s else 0.0 for s in adata_specific.obs_names])
 
-Optimizer_function = crested.tl.design.EnhancerOptimizer(optimize_func = mutli_class_weighted_differences)
+Optimizer_function = crested.tl.design.EnhancerOptimizer(optimize_func = bal_cosine_similarty_optimizer)
 
 met_hi_intermediate_results, met_hi_designed_sequences = crested.tl.design.in_silico_evolution(
         model= BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414,
@@ -179,7 +179,7 @@ met_hi_intermediate_results, met_hi_designed_sequences = crested.tl.design.in_si
         n_mutations= 20,
         n_sequences= 5,
         enhancer_optimizer= Optimizer_function,
-        target= hi_idx,
+        target= cos_hi_array,
 )
 met_lo_intermediate_results, met_lo_designed_sequences = crested.tl.design.in_silico_evolution(
         model= BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414,
@@ -189,11 +189,11 @@ met_lo_intermediate_results, met_lo_designed_sequences = crested.tl.design.in_si
         n_mutations= 20,
         n_sequences= 5,
         enhancer_optimizer=Optimizer_function,
-        target= lo_idx,
+        target= cos_lo_array,
 )
 
 # Check predictions for the designed sequences - ensure that they're high for our target class
-os.makedirs("output/CREsted_ISE/MWD", exist_ok=True)
+os.makedirs("output/CREsted_ISE/Balanced_Cos", exist_ok=True)
 #Make plots for met-high generated enhancers:
 print("Creating plots for generated enhancers")
 
@@ -201,7 +201,7 @@ fig, axs = plt.subplots(5, figsize = (15, 20), layout='constrained')
 for i in range(len(met_hi_designed_sequences)):
     prediction = crested.tl.predict(met_hi_designed_sequences[i], model=BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414)
     crested.pl.region.bar(prediction, classes=list(adata_specific.obs_names), title=f"Designed enhancer {i+1}", ax=axs[i], show=False)
-plt.savefig("output/CREsted_ISE/MWD/Comb_MH_Designed_enhancers.png", dpi=300)
+plt.savefig("output/CREsted_ISE/Balanced_Cos/Comb_MH_Designed_enhancers.png", dpi=300)
 plt.close()
 
 crested.pl.design.step_predictions(
@@ -211,7 +211,7 @@ crested.pl.design.step_predictions(
         separate=True,
         suptitle="Synthethic Met-High enhancers",
 )
-plt.savefig("output/CREsted_ISE/MWD/MH_Stepwise_Class_Predictions.png")
+plt.savefig("output/CREsted_ISE/Balanced_Cos/MH_Stepwise_Class_Predictions.png")
 plt.close()
 
 #Make plots for met-low generated enhancers:
@@ -219,7 +219,7 @@ fig, axs = plt.subplots(5, figsize = (15, 20), layout='constrained')
 for i in range(len(met_lo_designed_sequences)):
     prediction = crested.tl.predict(met_lo_designed_sequences[i], model=BM_02TS_prmean_2114_nonorm_ep10__FT_DA8414)
     crested.pl.region.bar(prediction, classes=list(adata_specific.obs_names), title=f"Designed enhancer {i+1}", ax=axs[i], show=False)
-plt.savefig("output/CREsted_ISE/MWD/Comb_ML_Designed_enhancers.png", dpi=300)
+plt.savefig("output/CREsted_ISE/Balanced_Cos/Comb_ML_Designed_enhancers.png", dpi=300)
 plt.close()
 
 crested.pl.design.step_predictions(
@@ -229,12 +229,12 @@ crested.pl.design.step_predictions(
         separate=True,
         suptitle="Synthethic Met-Low enhancers",
 )
-plt.savefig("output/CREsted_ISE/MWD/ML_Stepwise_Class_Predictions.png")
+plt.savefig("output/CREsted_ISE/Balanced_Cos/ML_Stepwise_Class_Predictions.png")
 plt.close()
 
 # Save final designed sequences to CSV
 met_hi_df = pd.DataFrame({'sequence': met_hi_designed_sequences, 'type': 'met_high'})
 met_lo_df = pd.DataFrame({'sequence': met_lo_designed_sequences, 'type': 'met_low'})
 all_sequences_df = pd.concat([met_hi_df, met_lo_df], ignore_index=True)
-all_sequences_df.to_csv("output/CREsted_ISE/MWD/final_enhancer_sequences.csv", index=False)
+all_sequences_df.to_csv("output/CREsted_ISE/Balanced_Cos/final_enhancer_sequences.csv", index=False)
 print("Saved final enhancer sequences to output/CREsted_ISE/final_enhancer_sequences.csv")

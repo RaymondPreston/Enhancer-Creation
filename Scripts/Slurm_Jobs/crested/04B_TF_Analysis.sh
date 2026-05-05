@@ -6,13 +6,12 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=24:00:00
-#SBATCH --partition=rp6b-8-gm768-c192-m2048
-#SBATCH --gpus=1
+#SBATCH --time=48:00:00
+#SBATCH --partition=c128-m1024
 
 # Create logs directory if it doesn't exist
 mkdir -p logs
-
+export CRESTED_DATA_DIR=/scratch/rprest2/Enhancer-Creation/input
 echo "Starting CREsted TF Motif Analysis..."
 
 conda init bash > /dev/null 2>&1
