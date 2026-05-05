@@ -77,7 +77,7 @@ Adjusted_Lo_MWD_kwargs = dict(
         variance_weight=0.25, #Default=0.5
 )
 
-# Map all dicts to run_configs
+# Map all dicts to run_configs to avoid messy if else statements I previously had
 run_configs = {
     "MWD": {
         "met_high": {"target": hi_idx, "kwargs": shared_kwargs},
