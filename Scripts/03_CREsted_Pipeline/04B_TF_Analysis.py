@@ -89,7 +89,8 @@ if not os.path.exists(path_check):
     )
     print("met_low contribution scores done.")
 else:
-    print("Files already exist. Skipping this")
+    print("Files already exist.")
+    
 
 output_dir = "/scratch/rprest2/Enhancer-Creation/output/modisco_results"
 contrib_dir_mh = "/scratch/rprest2/Enhancer-Creation/output/modisco_results/met_high_IG"
