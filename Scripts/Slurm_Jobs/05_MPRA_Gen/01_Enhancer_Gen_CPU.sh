@@ -4,11 +4,10 @@
 #SBATCH --error=logs/MPRA_Gen%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=96G
+#SBATCH --cpus-per-task=6
+#SBATCH --mem=32G
 #SBATCH --time=72:00:00
-#SBATCH --partition=h100-1-gm80-c16-m256
-#SBATCH --gpus=1
+#SBATCH --partition=c128-m1024
 
 # Send email notifications
 #SBATCH --mail-type=BEGIN
@@ -26,6 +25,6 @@ source ~/.bashrc
 conda activate Crested
 
 # Run the Python script
-python /scratch/rprest2/Enhancer-Creation/Scripts/05_MPRA_Gen/01_Enhancer_Gen.py
+python /scratch/rprest2/Enhancer-Creation/Scripts/05_MPRA_Gen/01_Enhancer_Gen_NEW.py
 
 echo "Enhancer generation complete."
