@@ -189,80 +189,100 @@ else:
     np.save(pred_cache, predictions)
     print(f"Predictions saved → {pred_cache}  shape={predictions.shape}")
 
-# --- Contribution scores ---
-
-
-# CREsted writes one file per class:
-#   class_id_N_contrib.npz  →  array shape (n_seqs, 4, seq_len)
-#   class_id_N_oh.npz       →  array shape (n_seqs, 4, seq_len)
+# --- Contribution scores (split by cell state) ---
 #
-# We check whether all 16 contrib files already exist (from a previous run).
-# If yes, load and stack them → contrib_scores shape: (n_seqs, n_classes, 4, seq_len)
-# If no, run contribution_scores() which will write them, then stack.
+# Met-high sequences → scored against Hi classes only (hi_class_indices)
+# Met-low  sequences → scored against Lo classes only (lo_class_indices)
+#
+# Separate output subdirs prevent file-name collisions (both would otherwise
+# write class_id_0_contrib.npz, class_id_1_contrib.npz, etc.)
 
-contrib_class_files = [
-    os.path.join(contr_dir, f"class_id_{i}_contrib.npz") for i in range(n_classes)
-]
-oh_class_files = [
-    os.path.join(contr_dir, f"class_id_{i}_oh.npz") for i in range(n_classes)
-]
+# Integer class indices (needed for target_idx parameter)
+hi_class_indices = np.where(hi_idx)[0].tolist()
+lo_class_indices = np.where(lo_idx)[0].tolist()
 
-all_contrib_exist = all(os.path.exists(f) for f in contrib_class_files)
-all_oh_exist      = all(os.path.exists(f) for f in oh_class_files)
+# Row masks for splitting df_all
+hi_seq_mask = (df_all["cell_state_target"] == "met_high").values
+lo_seq_mask = (df_all["cell_state_target"] == "met_low").values
 
-if all_contrib_exist and all_oh_exist:
-    print(f"Loading contribution scores from {n_classes} cached class files...")
-    contrib_list  = [np.load(f)["arr_0"] for f in contrib_class_files]
-    one_hot_list  = [np.load(f)["arr_0"] for f in oh_class_files]
-    # Each element: (n_seqs, 4, seq_len) → stack along new axis → (n_seqs, n_classes, 4, seq_len)
-    contrib_scores = np.stack(contrib_list, axis=1)
-    one_hot_seqs   = one_hot_list[0]   # identical across classes; just keep one
-    print(f"  contrib_scores shape: {contrib_scores.shape}")
-    print(f"  one_hot_seqs shape:   {one_hot_seqs.shape}")
+hi_sequences = df_all.loc[hi_seq_mask, "sequence"].tolist()
+lo_sequences = df_all.loc[lo_seq_mask, "sequence"].tolist()
+print(f"Met-high sequences: {len(hi_sequences)}  |  Met-low sequences: {len(lo_sequences)}")
+
+contr_hi_dir = os.path.join(contr_dir, "met_high")
+contr_lo_dir = os.path.join(contr_dir, "met_low")
+os.makedirs(contr_hi_dir, exist_ok=True)
+os.makedirs(contr_lo_dir, exist_ok=True)
+
+n_hi_classes = len(hi_class_indices)
+n_lo_classes = len(lo_class_indices)
+
+# ── Met-high contribution scores ─────────────────────────────────────────────
+contrib_hi_files = [os.path.join(contr_hi_dir, f"class_id_{i}_contrib.npz") for i in range(n_hi_classes)]
+oh_hi_files      = [os.path.join(contr_hi_dir, f"class_id_{i}_oh.npz")      for i in range(n_hi_classes)]
+
+if all(os.path.exists(f) for f in contrib_hi_files) and all(os.path.exists(f) for f in oh_hi_files):
+    print(f"Loading met-high contrib scores from {n_hi_classes} cached files...")
+    contrib_hi = np.stack([np.load(f)["arr_0"] for f in contrib_hi_files], axis=1)
+    one_hot_hi = np.load(oh_hi_files[0])["arr_0"]
+    print(f"  contrib_hi shape: {contrib_hi.shape}")
 else:
-    print("Running contribution scores for the first time (this will take a while)...")
-    contrib_scores, one_hot_seqs = crested.tl.contribution_scores(
-        input=df_all["sequence"].tolist(),
-        target_idx=None,
+    print("Running met-high contribution scores (Hi classes only)...")
+    contrib_hi, one_hot_hi = crested.tl.contribution_scores(
+        input=hi_sequences,
+        target_idx=hi_class_indices,
         model=ft_model,
         method="integrated_grad",
         batch_size=256,
         transpose=False,
-        output_dir=contr_dir,   # CREsted writes class_id_N_contrib.npz files here
+        output_dir=contr_hi_dir,
     )
-    # contrib_scores shape after return: (n_seqs, n_classes, 4, seq_len)
-    print(f"  contrib_scores shape: {contrib_scores.shape}")
-    print(f"  one_hot_seqs shape:   {one_hot_seqs.shape}")
+    print(f"  contrib_hi shape: {contrib_hi.shape}")
 
+# ── Met-low contribution scores ──────────────────────────────────────────────
+contrib_lo_files = [os.path.join(contr_lo_dir, f"class_id_{i}_contrib.npz") for i in range(n_lo_classes)]
+oh_lo_files      = [os.path.join(contr_lo_dir, f"class_id_{i}_oh.npz")      for i in range(n_lo_classes)]
 
-# ----- Verify and reduce contrib_scores to 1D per-position track -----
-# Actual CREsted output shape: (n_seqs, n_classes, seq_len, n_bases)
-#   axis 0 = sequences (1200)
-#   axis 1 = classes   (16)
-#   axis 2 = positions (2114)
-#   axis 3 = bases     (4: A/C/G/T)
-#
-# To get a single per-position importance score per sequence:
-#   1. Sum over classes (axis=1): (n_seqs, n_classes, seq_len, n_bases) → (n_seqs, seq_len, n_bases)
-#   2. Sum over bases   (axis=2): (n_seqs, seq_len, n_bases)            → (n_seqs, seq_len)
-#
-# Verification: print shape at each step so you can confirm axes are correct.
-assert contrib_scores.ndim == 4, (
-    f"Expected 4D contrib_scores, got shape {contrib_scores.shape}"
-)
-n_seqs, n_cls, seq_len, n_bases = contrib_scores.shape
-print(f"\ncontrib_scores axes: n_seqs={n_seqs}, n_classes={n_cls}, seq_len={seq_len}, n_bases={n_bases}")
-assert n_bases == 4,    f"Expected 4 bases at axis 3, got {n_bases}"
-assert seq_len == 2114, f"Expected seq_len=2114 at axis 2, got {seq_len}"
+if all(os.path.exists(f) for f in contrib_lo_files) and all(os.path.exists(f) for f in oh_lo_files):
+    print(f"Loading met-low contrib scores from {n_lo_classes} cached files...")
+    contrib_lo = np.stack([np.load(f)["arr_0"] for f in contrib_lo_files], axis=1)
+    one_hot_lo = np.load(oh_lo_files[0])["arr_0"]
+    print(f"  contrib_lo shape: {contrib_lo.shape}")
+else:
+    print("Running met-low contribution scores (Lo classes only)...")
+    contrib_lo, one_hot_lo = crested.tl.contribution_scores(
+        input=lo_sequences,
+        target_idx=lo_class_indices,
+        model=ft_model,
+        method="integrated_grad",
+        batch_size=256,
+        transpose=False,
+        output_dir=contr_lo_dir,
+    )
+    print(f"  contrib_lo shape: {contrib_lo.shape}")
 
-step1 = contrib_scores.sum(axis=1)   # (n_seqs, 2114, 4) — sum over classes
-step2 = step1.sum(axis=2)            # (n_seqs, 2114)     — sum over bases
-print(f"After sum(axis=1) [classes]: {step1.shape}")
-print(f"After sum(axis=2) [bases]:   {step2.shape}")
+# ── Reduce to 1D per-position track and recombine ────────────────────────────
+# Shape from CREsted (transpose=False): (n_seqs, n_classes, seq_len, 4)
+# Sum over classes (axis=1) then bases (axis=2) → (n_seqs, seq_len)
 
-contrib_1d      = step2                            # (n_seqs, 2114)
-contrib_1d_core = contrib_1d[:, 957 : 957 + 200]  # (n_seqs, 200)
+def reduce_contrib(arr, label):
+    assert arr.ndim == 4, f"[{label}] Expected 4D, got {arr.shape}"
+    n_s, n_c, s_len, n_b = arr.shape
+    print(f"[{label}] n_seqs={n_s}, n_classes={n_c}, seq_len={s_len}, n_bases={n_b}")
+    assert n_b == 4,      f"[{label}] Expected 4 bases, got {n_b}"
+    assert s_len == 2114, f"[{label}] Expected seq_len=2114, got {s_len}"
+    return arr.sum(axis=1).sum(axis=2)   # (n_seqs, 2114)
 
+contrib_1d_hi = reduce_contrib(contrib_hi, "met_high")   # (n_hi_seqs, 2114)
+contrib_1d_lo = reduce_contrib(contrib_lo, "met_low")    # (n_lo_seqs, 2114)
+
+# Recombine in original df_all row order so motif scan indices stay aligned
+contrib_1d      = np.empty((len(df_all), 2114), dtype=np.float32)
+contrib_1d[hi_seq_mask] = contrib_1d_hi
+contrib_1d[lo_seq_mask] = contrib_1d_lo
+
+contrib_1d_core = contrib_1d[:, 957:957 + 200]   # (n_seqs, 200)
+print(f"contrib_1d_core shape: {contrib_1d_core.shape}")
 motif_cache = os.path.join(contr_dir, "motif_matrix.npy")
 
 if os.path.exists(motif_cache):

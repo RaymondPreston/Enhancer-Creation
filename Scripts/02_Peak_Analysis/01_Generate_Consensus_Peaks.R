@@ -31,7 +31,7 @@ if (!file.exists("input/consensus_peaks_all.bed")) {
     print("consensus_peaks_all.bed already exists in input/, skipping export.")
 }
 
-# --- THE CHECKPOINT ---
+# --- Cache check ---
 if (file.exists("/scratch/rprest2/Enhancer-Creation/output/annotated_complete_peakset_no_H10.RDS")) {
   
   cat("\nCheckpoint found! Loading pre-calculated differential peaks...\n")
@@ -128,7 +128,7 @@ cat(sprintf("\nSaved: output/DA_peaks_for_finetune_02.tsv  (%d peaks)\n", nrow(o
 
 
 
-# Generating DNA-Diffusion Input
+# ---- Generating DNA-Diffusion Input ---
 
 cat("\n--- Generating DNA-Diffusion Input ---\n")
 
@@ -177,3 +177,7 @@ write.table(
 
 cat(sprintf("Success! Exported %d formatted sequences to %s\n", 
             nrow(dna_diff_df), output_path))
+
+
+
+# ---- Subset concordant peaks -----

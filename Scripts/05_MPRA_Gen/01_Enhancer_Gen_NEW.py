@@ -143,8 +143,7 @@ else:
         print(df_all.groupby(["cell_state_target", "optimizer_used"]).size())  # sanity check
 
 
-# ----- Predictions & Contribution Scores -----
-# TO DO: I need to redo the contributions section. I should be doing contributions for met-high and met-low classes seperately.
+# ----- Prediction Scoring -----
 contr_dir = os.path.join(output_dir, "Contribution_Scores")
 os.makedirs(contr_dir, exist_ok=True)
 
@@ -164,41 +163,68 @@ else:
     np.save(pred_cache, predictions)
     print(f"Predictions saved → {pred_cache}  shape={predictions.shape}")
 
-# --- Contribution scores --- 
-contrib_class_files = [
-    os.path.join(contr_dir, f"class_id_{i}_contrib.npz") for i in range(n_classes)
-]
-oh_class_files = [
-    os.path.join(contr_dir, f"class_id_{i}_oh.npz") for i in range(n_classes)
-]
+# ----- Contribution Scoring -----
+hi_class_indices = np.where(hi_idx)[0].tolist()
+lo_class_indices = np.where(lo_idx)[0].tolist()
+n_hi_classes = len(hi_class_indices)
+n_lo_classes = len(lo_class_indices)
+hi_seq_mask = (df_all["cell_state_target"] == "met_high").values
+lo_seq_mask = (df_all["cell_state_target"] == "met_low").values
+hi_sequences = df_all.loc[hi_seq_mask, "sequence"].tolist()
+lo_sequences = df_all.loc[lo_seq_mask, "sequence"].tolist()
+print(f"Met-high sequences: {len(hi_sequences)}  |  Met-low sequences: {len(lo_sequences)}")
 
-all_contrib_exist = all(os.path.exists(f) for f in contrib_class_files)
-all_oh_exist      = all(os.path.exists(f) for f in oh_class_files)
+contr_hi_dir = os.path.join(contr_dir, "met_high")
+contr_lo_dir = os.path.join(contr_dir, "met_low")
+os.makedirs(contr_hi_dir, exist_ok=True)
+os.makedirs(contr_lo_dir, exist_ok=True)
 
-if all_contrib_exist and all_oh_exist:
-    print(f"Loading contribution scores from {n_classes} cached class files...")
-    contrib_list  = [np.load(f)["arr_0"] for f in contrib_class_files]
-    one_hot_list  = [np.load(f)["arr_0"] for f in oh_class_files]
-    # Each element: (n_seqs, 4, seq_len) → stack along new axis → (n_seqs, n_classes, 4, seq_len)
-    contrib_scores = np.stack(contrib_list, axis=1)
-    one_hot_seqs   = one_hot_list[0]   # identical across classes; just keep one
-    print(f"  contrib_scores shape: {contrib_scores.shape}")
-    print(f"  one_hot_seqs shape:   {one_hot_seqs.shape}")
+# ── Met-high ──────────────────────────────────────────────────────────────────
+# hi_class_indices contains the TRUE model class indices (e.g. [0,1,2,10,11])
+# CREsted names output files as class_id_{true_index}_contrib.npz — must match.
+contrib_hi_files = [os.path.join(contr_hi_dir, f"class_id_{i}_contrib.npz") for i in hi_class_indices]
+oh_hi_files      = [os.path.join(contr_hi_dir, f"class_id_{i}_oh.npz")      for i in hi_class_indices]
+
+if all(os.path.exists(f) for f in contrib_hi_files) and all(os.path.exists(f) for f in oh_hi_files):
+    print(f"Loading met-high contrib scores from {n_hi_classes} cached files...")
+    # Stack along axis=1 → (n_hi_seqs, n_hi_classes, seq_len, 4)
+    contrib_hi = np.stack([np.load(f)["arr_0"] for f in contrib_hi_files], axis=1)
+    # One-hot is sequence-specific, identical across class files — load from first
+    one_hot_hi = np.load(oh_hi_files[0])["arr_0"]
 else:
-    print("Running contribution scores for the first time (this will take a while)...")
-    contrib_scores, one_hot_seqs = crested.tl.contribution_scores(
-        input=df_all["sequence"].tolist(),
-        target_idx=None,
+    print("Running met-high contribution scores (Hi classes only)...")
+    contrib_hi, one_hot_hi = crested.tl.contribution_scores(
+        input=hi_sequences,
+        target_idx=hi_class_indices,
         model=ft_model,
         method="integrated_grad",
         batch_size=256,
         transpose=False,
-        output_dir=contr_dir,   # CREsted writes class_id_N_contrib.npz files here
+        output_dir=contr_hi_dir,
     )
-    # contrib_scores shape after return: (n_seqs, n_classes, 4, seq_len)
-    print(f"  contrib_scores shape: {contrib_scores.shape}")
-    print(f"  one_hot_seqs shape:   {one_hot_seqs.shape}")
+print(f"  contrib_hi shape: {contrib_hi.shape}   one_hot_hi shape: {one_hot_hi.shape}")
 
+# ── Met-low ───────────────────────────────────────────────────────────────────
+# lo_class_indices contains the TRUE model class indices (e.g. [3,4,5,6,7,8,9,12,13,14,15])
+contrib_lo_files = [os.path.join(contr_lo_dir, f"class_id_{i}_contrib.npz") for i in lo_class_indices]
+oh_lo_files      = [os.path.join(contr_lo_dir, f"class_id_{i}_oh.npz")      for i in lo_class_indices]
+
+if all(os.path.exists(f) for f in contrib_lo_files) and all(os.path.exists(f) for f in oh_lo_files):
+    print(f"Loading met-low contrib scores from {n_lo_classes} cached files...")
+    contrib_lo = np.stack([np.load(f)["arr_0"] for f in contrib_lo_files], axis=1)
+    one_hot_lo = np.load(oh_lo_files[0])["arr_0"]
+else:
+    print("Running met-low contribution scores (Lo classes only)...")
+    contrib_lo, one_hot_lo = crested.tl.contribution_scores(
+        input=lo_sequences,
+        target_idx=lo_class_indices,
+        model=ft_model,
+        method="integrated_grad",
+        batch_size=256,
+        transpose=False,
+        output_dir=contr_lo_dir,
+    )
+print(f"  contrib_lo shape: {contrib_lo.shape}   one_hot_lo shape: {one_hot_lo.shape}")
 
 # ---- Running TFMoDisco on the sequences -----
 '''
@@ -375,14 +401,10 @@ axes = axes.flatten()
 for ax, (col, title, xlabel) in zip(axes, metrics):
     for state, color in STATE_COLORS.items():
         
-        # --- NEW FILTERING LOGIC ---
-        # Skip plotting Met-Low enhancers on the Met-High Strength plot
         if col == "Met_High Strength" and state != "met_high":
             continue
-        # Skip plotting Met-High enhancers on the Met-Low Strength plot
         if col == "Met_Low Strength" and state != "met_low":
             continue
-        # ---------------------------
 
         subset = df_all[df_all["cell_state_target"] == state][col].dropna()
         sns.histplot(
@@ -465,4 +487,55 @@ fig1.savefig(out1, dpi=200, bbox_inches="tight")
 plt.close()
 print(f"Saved {out1}")
 
-# ---- TF-MINDI Analysis -----
+# ---- Plots of 20 random ISE enhancers explained contribution scores -----
+# ---- Sequence Logo Plots for 20 Random ISE Enhancers -----
+def plot_logo_subset(sample_df, target_name, filename, contrib_arr, seq_mask, one_hot_seqs):
+    """Generates a 5x2 grid of CREsted sequence logo (contribution score) plots."""
+
+    fig, axes = plt.subplots(nrows=5, ncols=2, figsize=(16, 12), layout='constrained')
+    axes = axes.flatten()
+
+    print(f"Generating sequence logos for {target_name}...")
+
+    # Build mapping: df_all integer index → local row index in contrib_arr / one_hot_seqs
+    global_indices  = np.where(seq_mask)[0]
+    global_to_local = {g: li for li, g in enumerate(global_indices)}
+
+    for i, (orig_idx, row) in enumerate(sample_df.iterrows()):
+        seq_id    = row['sequence_id']
+        local_idx = global_to_local[orig_idx]
+
+        # contrib_arr:  (n_seqs, n_classes, 2114, 4)
+        # → select sequence, mean over classes → (2114, 4)
+        mean_contrib = contrib_arr[local_idx].mean(axis=0)   # (2114, 4)
+
+        # one_hot_seqs: (n_seqs, 2114, 4)
+        # → select sequence first, then pass full 2114 bp to the plotter
+        full_one_hot = one_hot_seqs[local_idx]               # (2114, 4)
+
+        crested.pl.explain.contribution_scores(
+            scores=mean_contrib,
+            seqs_one_hot=full_one_hot,
+            zoom_n_bases=200,                                # zoom to 200 bp core
+            ax=axes[i],
+            show=False,
+        )
+        axes[i].set_title(f"{target_name} | {seq_id}", fontsize=11, fontweight="bold")
+
+    fig.suptitle(
+        f"Driving Motifs: {target_name} Enhancer Core (200 bp)",
+        fontsize=20, fontweight='bold',
+    )
+
+    out = os.path.join(output_dir, f"{filename}.png")
+    plt.savefig(out, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"--> Saved sequence logos to {out}\n")
+
+
+# --- Execute ---
+plot_logo_subset(met_high_samples, "Met-High", "QC_Sample_MetHigh_Logos", contrib_hi, hi_seq_mask, one_hot_hi)
+plot_logo_subset(met_low_samples,  "Met-Low",  "QC_Sample_MetLow_Logos",  contrib_lo, lo_seq_mask, one_hot_lo)
+
+
+# ---- TF-MINDI  -----
